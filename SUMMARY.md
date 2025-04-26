@@ -1,0 +1,18 @@
+# Table of contents
+
+* [Sift: Powerful Data Validation for Python](README.md)
+  * [Table of contents](docs/SUMMARY.md)
+  * [deployment](docs/deployment/README.md)
+    * [Framework Integration](docs/deployment/framework-integration.md)
+    * [Integration Guide](docs/deployment/integration.md)
+  * [getting-started](docs/getting-started/README.md)
+    * [Installation](docs/getting-started/installation.md)
+    * [Quickstart](docs/getting-started/quickstart.md)
+  * [guides](docs/guides/README.md)
+    * [Advanced Validation](docs/guides/advanced-validation.md)
+    * [Async Validation](docs/guides/async-validation.md)
+    * [Basic Validation](docs/guides/basic-validation.md)
+    * [OpenAPI Integration](docs/guides/openapi.md)
+    * [pydantic](docs/guides/pydantic.md)
+* [Sift Examples](examples/README.md)
+* [Sift](sift/README.md)

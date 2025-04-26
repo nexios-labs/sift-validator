@@ -1,12 +1,8 @@
 # Sift: Powerful Data Validation for Python
 
-<div align="center">
-  <img src=".gitbook/assets/logo.svg" alt="Sift Logo" width="240">
-  
-  [![PyPI version](https://badge.fury.io/py/sift-validator.svg)](https://badge.fury.io/py/sift-validator)
-  [![Python Versions](https://img.shields.io/pypi/pyversions/sift-validator.svg)](https://pypi.org/project/sift-validator/)
-[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-</div>
+![Sift Logo](docs/.gitbook/assets/logo.svg)
+
+[![PyPI version](https://badge.fury.io/py/sift-validator.svg)](https://badge.fury.io/py/sift-validator)[![Python Versions](https://img.shields.io/pypi/pyversions/sift-validator.svg)](https://pypi.org/project/sift-validator/)[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Introduction
 
@@ -14,35 +10,39 @@ Sift is a robust, type-safe data validation library for Python, designed to make
 
 ### Key Features
 
-- **Type-safe validation**: Utilizes Python's type hinting for intelligent validation
-- **Composable validators**: Build complex schemas from simple, reusable components
-- **Zero dependencies**: Core functionality has no external dependencies
-- **Customizable error messages**: Clear, contextual error reporting
-- **Optional and nullable fields**: First-class support for handling missing or null data
-- **Async support**: Native async validation for high-performance applications
-- **Framework integration**: Seamless integration with Nexios and other web frameworks
+* **Type-safe validation**: Utilizes Python's type hinting for intelligent validation
+* **Composable validators**: Build complex schemas from simple, reusable components
+* **Zero dependencies**: Core functionality has no external dependencies
+* **Customizable error messages**: Clear, contextual error reporting
+* **Optional and nullable fields**: First-class support for handling missing or null data
+* **Async support**: Native async validation for high-performance applications
+* **Framework integration**: Seamless integration with Nexios and other web frameworks
 
 ## Documentation
 
 This documentation is organized into several sections to help you get started with Sift and make the most of its features:
 
 ### Getting Started
-- [Installation](getting-started/installation.md) - Install Sift and set up your environment
-- [Quickstart](getting-started/quickstart.md) - Learn the basics with a simple example
+
+* [Installation](docs/getting-started/installation.md) - Install Sift and set up your environment
+* [Quickstart](docs/getting-started/quickstart.md) - Learn the basics with a simple example
 
 ### Guides
-- [Basic Validation](guides/basic-validation.md) - Core validation concepts and primitive validators
-- [Advanced Validation](guides/advanced-validation.md) - Complex schemas, custom validators, and transformations
-- [Async Validation](guides/async-validation.md) - High-performance validation with async support
-- [OpenAPI Integration](guides/openapi.md) - Generate OpenAPI schemas from Sift validators
+
+* [Basic Validation](docs/guides/basic-validation.md) - Core validation concepts and primitive validators
+* [Advanced Validation](docs/guides/advanced-validation.md) - Complex schemas, custom validators, and transformations
+* [Async Validation](docs/guides/async-validation.md) - High-performance validation with async support
+* [OpenAPI Integration](docs/guides/openapi.md) - Generate OpenAPI schemas from Sift validators
 
 ### API Reference
-- [Validators](api-reference/validators.md) - Detailed documentation of all validator types
-- [Methods](api-reference/methods.md) - Common methods available across validators
+
+* [Validators](docs/api-reference/validators.md) - Detailed documentation of all validator types
+* [Methods](docs/api-reference/methods.md) - Common methods available across validators
 
 ### Deployment
-- [Integration](deployment/integration.md) - Integrate Sift into your projects
-- [Framework Integration](deployment/framework-integration.md) - Use Sift with web frameworks
+
+* [Integration](docs/deployment/integration.md) - Integrate Sift into your projects
+* [Framework Integration](docs/deployment/framework-integration.md) - Use Sift with web frameworks
 
 ## Installation
 
@@ -87,6 +87,7 @@ try:
 except ValidationError as e:
     print("Validation failed:", e)
 ```
+
 ## Basic Usage
 
 ### Primitive Validators
@@ -313,50 +314,50 @@ print(result)  # {"username": "johndoe", "is_active": True, "score": 100}
 
 All validator types inherit these methods:
 
-| Method | Description |
-|--------|-------------|
-| `optional()` | Makes the field optional (can be omitted) |
-| `nullable()` | Makes the field nullable (can be explicitly `None`) |
-| `default(value)` | Sets a default value for optional fields |
-| `error(message)` | Sets a custom error message |
-| `validate(data)` | Validates data synchronously |
-| `validate_async(data)` | Validates data asynchronously |
+| Method                 | Description                                         |
+| ---------------------- | --------------------------------------------------- |
+| `optional()`           | Makes the field optional (can be omitted)           |
+| `nullable()`           | Makes the field nullable (can be explicitly `None`) |
+| `default(value)`       | Sets a default value for optional fields            |
+| `error(message)`       | Sets a custom error message                         |
+| `validate(data)`       | Validates data synchronously                        |
+| `validate_async(data)` | Validates data asynchronously                       |
 
 ### Primitive Validators
 
 #### String
 
-| Method | Description |
-|--------|-------------|
-| `min(length)` | Minimum string length |
-| `max(length)` | Maximum string length |
-| `length(length)` | Exact string length |
-| `pattern(regex)` | Regular expression pattern |
-| `email()` | Validates as email address |
-| `url()` | Validates as URL |
-| `uuid()` | Validates as UUID |
-| `datetime()` | Validates as ISO format datetime |
-| `date()` | Validates as ISO format date |
-| `trim()` | Trims whitespace from string |
-| `lowercase()` | Converts string to lowercase |
-| `uppercase()` | Converts string to uppercase |
-| `nonempty()` | Requires non-empty string |
+| Method           | Description                      |
+| ---------------- | -------------------------------- |
+| `min(length)`    | Minimum string length            |
+| `max(length)`    | Maximum string length            |
+| `length(length)` | Exact string length              |
+| `pattern(regex)` | Regular expression pattern       |
+| `email()`        | Validates as email address       |
+| `url()`          | Validates as URL                 |
+| `uuid()`         | Validates as UUID                |
+| `datetime()`     | Validates as ISO format datetime |
+| `date()`         | Validates as ISO format date     |
+| `trim()`         | Trims whitespace from string     |
+| `lowercase()`    | Converts string to lowercase     |
+| `uppercase()`    | Converts string to uppercase     |
+| `nonempty()`     | Requires non-empty string        |
 
 #### Number
 
-| Method | Description |
-|--------|-------------|
-| `min(value)` | Minimum value |
-| `max(value)` | Maximum value |
-| `int()` | Must be an integer |
-| `positive()` | Must be positive (> 0) |
-| `negative()` | Must be negative (< 0) |
+| Method               | Description                 |
+| -------------------- | --------------------------- |
+| `min(value)`         | Minimum value               |
+| `max(value)`         | Maximum value               |
+| `int()`              | Must be an integer          |
+| `positive()`         | Must be positive (> 0)      |
+| `negative()`         | Must be negative (< 0)      |
 | `multiple_of(value)` | Must be a multiple of value |
 
 #### Boolean
 
-| Method | Description |
-|--------|-------------|
+| Method     | Description                                      |
+| ---------- | ------------------------------------------------ |
 | `truthy()` | Allows truthy/falsy values (converts to boolean) |
 
 #### Any
@@ -371,45 +372,45 @@ Only accepts `None` values.
 
 #### Object
 
-| Method | Description |
-|--------|-------------|
-| `additional_properties(value)` | Controls additional properties (True, False, or validator) |
-| `pattern_property(pattern, validator)` | Adds validation for properties matching a pattern |
-| `required(*keys)` | Specifies which keys are required |
-| `min_properties(count)` | Minimum number of properties |
-| `max_properties(count)` | Maximum number of properties |
+| Method                                 | Description                                                |
+| -------------------------------------- | ---------------------------------------------------------- |
+| `additional_properties(value)`         | Controls additional properties (True, False, or validator) |
+| `pattern_property(pattern, validator)` | Adds validation for properties matching a pattern          |
+| `required(*keys)`                      | Specifies which keys are required                          |
+| `min_properties(count)`                | Minimum number of properties                               |
+| `max_properties(count)`                | Maximum number of properties                               |
 
 #### List
 
-| Method | Description |
-|--------|-------------|
-| `min(length)` | Minimum list length |
-| `max(length)` | Maximum list length |
-| `length(length)` | Exact list length |
-| `unique()` | Requires all items to be unique |
-| `nonempty()` | Requires at least one item |
+| Method           | Description                     |
+| ---------------- | ------------------------------- |
+| `min(length)`    | Minimum list length             |
+| `max(length)`    | Maximum list length             |
+| `length(length)` | Exact list length               |
+| `unique()`       | Requires all items to be unique |
+| `nonempty()`     | Requires at least one item      |
 
 #### Dict
 
-| Method | Description |
-|--------|-------------|
-| `additional_properties(value)` | Controls additional properties (True, False, or validator) |
-| `pattern_property(pattern, validator)` | Adds validation for properties matching a pattern |
-| `required(*keys)` | Specifies which keys are required |
-| `min_properties(count)` | Minimum number of properties |
-| `max_properties(count)` | Maximum number of properties |
+| Method                                 | Description                                                |
+| -------------------------------------- | ---------------------------------------------------------- |
+| `additional_properties(value)`         | Controls additional properties (True, False, or validator) |
+| `pattern_property(pattern, validator)` | Adds validation for properties matching a pattern          |
+| `required(*keys)`                      | Specifies which keys are required                          |
+| `min_properties(count)`                | Minimum number of properties                               |
+| `max_properties(count)`                | Maximum number of properties                               |
 
 #### Tuple
 
-| Method | Description |
-|--------|-------------|
-| `min(length)` | Minimum tuple length |
+| Method        | Description                                |
+| ------------- | ------------------------------------------ |
+| `min(length)` | Minimum tuple length                       |
 | `max(length)` | Maximum tuple length (with rest validator) |
 
 #### Union
 
-| Method | Description |
-|--------|-------------|
+| Method                           | Description                             |
+| -------------------------------- | --------------------------------------- |
 | `discriminator_mapping(mapping)` | Maps discriminator values to validators |
 
 ## Advanced Usage
@@ -551,9 +552,6 @@ async def create_user(request :Request, response :Response):
     return res.json({"status": "success", "message": f"User {username} created"})
 ```
 
-
-
-
 ## OpenAPI Integration
 
 Sift provides tools for generating OpenAPI schema definitions from your validation schemas, making it easy to document your API.
@@ -630,49 +628,46 @@ Example output:
 }
 ```
 
-
 ## Contributing
 
 Contributions to Sift are welcome! Here's how you can contribute:
 
 ### Development Setup
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/nexios/sift.git
-   cd sift
-   ```
+1.  Clone the repository:
 
-2. Create a virtual environment and install dependencies:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use: venv\Scripts\activate
-   pip install -e ".[dev]"
-   ```
+    ```bash
+    git clone https://github.com/nexios/sift.git
+    cd sift
+    ```
+2.  Create a virtual environment and install dependencies:
 
-3. Run tests:
-   ```bash
-   pytest
-   ```
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+    pip install -e ".[dev]"
+    ```
+3.  Run tests:
+
+    ```bash
+    pytest
+    ```
 
 ### Contributing Guidelines
 
 1. **Bug Reports**: Please use the issue tracker to report bugs, including a minimal reproducible example.
-
 2. **Feature Requests**: Open an issue describing the feature and its use case.
-
 3. **Pull Requests**:
-   - Fork the repository
-   - Create a new branch for your feature or bugfix
-   - Add tests for your changes
-   - Update documentation as needed
-   - Submit a pull request
+   * Fork the repository
+   * Create a new branch for your feature or bugfix
+   * Add tests for your changes
+   * Update documentation as needed
+   * Submit a pull request
+4.  **Code Style**: Follow PEP 8 guidelines. Run the linter before submitting:
 
-4. **Code Style**: Follow PEP 8 guidelines. Run the linter before submitting:
-   ```bash
-   flake8 sift
-   ```
-
+    ```bash
+    flake8 sift
+    ```
 5. **Documentation**: Update the documentation when adding or modifying features.
 
 ### Code of Conduct
@@ -681,9 +676,8 @@ We expect all contributors to be respectful and considerate of others. Please re
 
 ## License
 
-Sift is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Sift is licensed under the MIT License. See the [LICENSE](docs/LICENSE/) file for details.
 
 ## Acknowledgements
 
 Sift is created and maintained byCreated by [techwithdunamix](https://github.com/techwithdunamix) and maintained by [Nexios Labs](https://github.com/nexios-labs). Special thanks to all contributors who have helped make Sift better.
-

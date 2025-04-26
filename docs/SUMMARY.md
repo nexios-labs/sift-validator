@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Introduction](README.md)
+* [Introduction](../)
 
 ## Getting Started
 
@@ -29,5 +29,4 @@
 
 * [GitHub Repository](https://github.com/nexios/sift)
 * [PyPI Package](https://pypi.org/project/sift-validator/)
-* [Examples](examples/README.md)
-
+* [Examples](examples/)
