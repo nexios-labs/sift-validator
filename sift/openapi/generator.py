@@ -66,44 +66,59 @@ class OpenAPISchemaGenerator:
         Returns:
             OpenAPI schema object
         """
+        schema = {}
+        
         # Handle String validator
         if isinstance(validator, String):
-            return self._generate_string_schema(validator)
+            schema = self._generate_string_schema(validator)
             
         # Handle Number validator
         elif isinstance(validator, Number):
-            return self._generate_number_schema(validator)
+            schema = self._generate_number_schema(validator)
             
         # Handle Boolean validator
         elif isinstance(validator, Boolean):
-            return self._generate_boolean_schema(validator)
+            schema = self._generate_boolean_schema(validator)
             
         # Handle List validator
         elif isinstance(validator, ListValidator):
-            return self._generate_array_schema(validator)
+            schema = self._generate_array_schema(validator)
             
         # Handle Dict validator
         elif isinstance(validator, DictValidator):
-            return self._generate_object_schema(validator)
+            schema = self._generate_object_schema(validator)
             
         # Handle Tuple validator
         elif isinstance(validator, TupleValidator):
-            return self._generate_tuple_schema(validator)
+            schema = self._generate_tuple_schema(validator)
             
         # Handle Union validator
         elif isinstance(validator, UnionValidator):
-            return self._generate_union_schema(validator)
+            schema = self._generate_union_schema(validator)
             
         # Handle Null validator
         elif isinstance(validator, Null):
-            return {"type": "null"}
+            schema = {"type": "null"}
             
         # Handle Any validator
         elif isinstance(validator, AnyValidator):
-            return {}  # No restrictions
+            schema = {}  # No restrictions
             
-        # Default case
-        return {}
+        # Check if this is a custom validator that inherits from Object
+        elif hasattr(validator, "_schema") and callable(getattr(validator, "_validate", None)):
+            # This is likely a custom validator class that inherits from Object
+            # Try to get its schema
+            try:
+                schema = self._generate_object_schema(validator)
+            except AttributeError:
+                # Fall back to empty schema
+                schema = {}
+        
+        # Add nullable if specified
+        if schema and getattr(validator, "_nullable", False):
+            schema["nullable"] = True
+        
+        return schema
         
     def _generate_string_schema(self, validator: String) -> Dict[str, Any]:
         """Generate OpenAPI schema for String validator."""
@@ -188,35 +203,63 @@ class OpenAPISchemaGenerator:
         """Generate OpenAPI schema for Dict validator."""
         schema: Dict[str, Any] = {"type": "object"}
         
+        # Get the schema dict - different attribute name depending on the class
+        schema_dict = None
+        if hasattr(validator, "_schema"):
+            schema_dict = validator._schema
+        elif hasattr(validator, "__dict__") and hasattr(validator, "__class__"):
+            # Try to find it in the object's dictionary by convention
+            for attr_name in ["_schema", "schema"]:
+                if attr_name in validator.__dict__:
+                    schema_dict = validator.__dict__[attr_name]
+                    break
+        
         # Add properties from schema
-        if validator._schema:
+        if schema_dict:
             properties = {}
-            for key, val in validator._schema.items():
+            for key, val in schema_dict.items():
+                # Skip private attributes
+                if isinstance(key, str) and key.startswith("_"):
+                    continue
                 properties[key] = self._generate_schema_for_validator(val)
             schema["properties"] = properties
             
             # Add required properties
-            if validator._required_keys:
-                schema["required"] = list(validator._required_keys)
+            required_keys = []
+            if hasattr(validator, "_required_keys"):
+                required_keys = list(validator._required_keys)
+            else:
+                # Determine required keys based on the schema
+                for key, val in schema_dict.items():
+                    if isinstance(key, str) and not key.startswith("_"):
+                        if not (hasattr(val, "_optional") and val._optional) and not (hasattr(val, "_nullable") and val._nullable):
+                            required_keys.append(key)
+            
+            if required_keys:
+                schema["required"] = required_keys
+        else:
+            # Always include an empty properties object for object type
+            schema["properties"] = {}
                 
         # Add additionalProperties constraint
-        if isinstance(validator._additional_properties, bool):
-            schema["additionalProperties"] = validator._additional_properties
-        elif validator._additional_properties is not True:  # Not the default True
-            schema["additionalProperties"] = self._generate_schema_for_validator(validator._additional_properties)
+        if hasattr(validator, "_additional_properties"):
+            if isinstance(validator._additional_properties, bool):
+                schema["additionalProperties"] = validator._additional_properties
+            elif validator._additional_properties is not True:  # Not the default True
+                schema["additionalProperties"] = self._generate_schema_for_validator(validator._additional_properties)
             
         # Add patternProperties
-        if validator._pattern_properties:
+        if hasattr(validator, "_pattern_properties") and validator._pattern_properties:
             pattern_properties = {}
             for pattern, val in validator._pattern_properties.items():
                 pattern_properties[pattern] = self._generate_schema_for_validator(val)
             schema["patternProperties"] = pattern_properties
             
         # Add property count constraints
-        if validator._min_properties is not None:
+        if hasattr(validator, "_min_properties") and validator._min_properties is not None:
             schema["minProperties"] = validator._min_properties
             
-        if validator._max_properties is not None:
+        if hasattr(validator, "_max_properties") and validator._max_properties is not None:
             schema["maxProperties"] = validator._max_properties
             
         return schema
@@ -256,24 +299,35 @@ class OpenAPISchemaGenerator:
         
     def _generate_union_schema(self, validator: UnionValidator) -> Dict[str, Any]:
         """Generate OpenAPI schema for Union validator."""
-        # For OpenAPI, unions are represented as anyOf
+        # For OpenAPI, unions are represented as oneOf
         schema: Dict[str, Any] = {
-            "anyOf": [
+            "oneOf": [
                 self._generate_schema_for_validator(val) 
                 for val in validator._validators
             ]
         }
         
         # Add discriminator if provided
-        if validator._discriminator and validator._discriminator_map:
+        if hasattr(validator, "_discriminator") and validator._discriminator:
             schema["discriminator"] = {
-                "propertyName": validator._discriminator,
-                "mapping": {
-                    k: f"#/components/schemas/{k}" 
-                    for k in validator._discriminator_map.keys()
-                }
+                "propertyName": validator._discriminator
             }
             
+            # Add mapping if available
+            if hasattr(validator, "_discriminator_map") and validator._discriminator_map:
+                schema["discriminator"]["mapping"] = {}
+                
+                for k, v in validator._discriminator_map.items():
+                    # Generate a schema name based on discriminator value
+                    schema_name = f"{k}Schema"
+                    
+                    # Add to referenced schemas
+                    component_schema = self._generate_schema_for_validator(v)
+                    self.referenced_schemas[schema_name] = component_schema
+                    
+                    # Add to mapping
+                    schema["discriminator"]["mapping"][str(k)] = f"#/components/schemas/{schema_name}"
+        
         return schema
 
 def generate_openapi_schema(validator: Validator, schema_name: Optional[str] = None) -> Dict[str, Any]:
