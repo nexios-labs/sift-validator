@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Introduction](../)
+* [Introduction](broken-reference)
 
 ## Getting Started
 
@@ -16,8 +16,8 @@
 
 ## API Reference
 
-* [Validators](api-reference/validators.md)
-* [Methods](api-reference/methods.md)
+* [Validators](docs/api-reference/validators.md)
+* [Methods](docs/api-reference/methods.md)
 
 ## Deployment
 
@@ -29,4 +29,4 @@
 
 * [GitHub Repository](https://github.com/nexios/sift)
 * [PyPI Package](https://pypi.org/project/sift-validator/)
-* [Examples](examples/)
+* [Examples](docs/examples/)
