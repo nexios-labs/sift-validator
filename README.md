@@ -5,7 +5,7 @@
   
   [![PyPI version](https://badge.fury.io/py/sift-validator.svg)](https://badge.fury.io/py/sift-validator)
   [![Python Versions](https://img.shields.io/pypi/pyversions/sift-validator.svg)](https://pypi.org/project/sift-validator/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 </div>
 
 ## Introduction
