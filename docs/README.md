@@ -1,3 +1,5 @@
+![Sift Logo](./assets/logo.png)
+
 # Sift
 
 A modern Python validation library with Zod-like syntax, async support, and OpenAPI integration.
