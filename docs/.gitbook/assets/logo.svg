@@ -1,31 +1,13 @@
-<svg width="240" height="80" viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background Elements -->
-  <defs>
-    <linearGradient id="gradientFill" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3498db" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#2ecc71" stop-opacity="0.8"/>
-    </linearGradient>
-  </defs>
-  
-  <!-- Sift Text -->
-  <text x="90" y="50" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#2c3e50">
-    Sift
-  </text>
-  
-  <!-- Funnel/Filter Icon -->
-  <g transform="translate(40, 40) scale(1.8)">
-    <!-- Funnel Shape -->
-    <path d="M0,0 L24,0 L16,12 L16,20 L8,24 L8,12 Z" fill="url(#gradientFill)" stroke="#2c3e50" stroke-width="1.5"/>
-    
-    <!-- Data Particles -->
-    <circle cx="6" cy="4" r="1.5" fill="#fff"/>
-    <circle cx="12" cy="5" r="1.5" fill="#fff"/>
-    <circle cx="18" cy="4" r="1.5" fill="#fff"/>
-    
-    <!-- Validated Data (Checkmark) -->
-    <path d="M10,18 L12,20 L16,16" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  
-  
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <path 
+    d="M50 50 Q100 20 150 50 Q130 100 100 150 Q70 100 50 50 Z" 
+    fill="none" 
+    stroke="#2E7D32" 
+    stroke-width="6" 
+  />
+  <path 
+    d="M75 70 Q100 55 125 70 Q115 95 100 120 Q85 95 75 70 Z" 
+    fill="#4CAF50" 
+  />
+  <circle cx="100" cy="135" r="8" fill="white" />
 </svg>
-
