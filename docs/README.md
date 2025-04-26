@@ -1,32 +1,81 @@
-# Table of contents
+# Sift
 
-* [Introduction](broken-reference)
+A modern Python validation library with Zod-like syntax, async support, and OpenAPI integration.
 
-## Getting Started
+## Features
 
-* [Installation](getting-started/installation.md)
-* [Quickstart](getting-started/quickstart.md)
+- 🔄 **Chainable API**: Intuitive, fluent interface for building validation schemas
+- ⚡ **Async Support**: Fast, non-blocking validation for high-performance applications
+- 📝 **Type Hints**: Comprehensive typing for excellent editor integration
+- 📊 **OpenAPI**: Seamless generation of OpenAPI schemas from your validators
+- 🔍 **Powerful Validation**: Built-in validators for common use cases with custom validation support
+- 🔧 **Data Transformation**: Transform and normalize data during validation
 
-## Guides
+## Installation
 
-* [Basic Validation](guides/basic-validation.md)
-* [Advanced Validation](guides/advanced-validation.md)
-* [Async Validation](guides/async-validation.md)
-* [OpenAPI Integration](guides/openapi.md)
+```bash
+pip install sift
+```
 
-## API Reference
+## Quick Start
 
-* [Validators](docs/api-reference/validators.md)
-* [Methods](docs/api-reference/methods.md)
+```python
+from sift import String, Number, Object, List
 
-## Deployment
+# Define a schema
+user_schema = Object({
+    "username": String().min(3).max(20).trim(),
+    "email": String().email(),
+    "age": Number().int().min(18).optional(),
+    "tags": List(String()).min(1).max(5),
+})
 
-* [Integration](deployment/integration.md)
-* [Framework Integration](deployment/framework-integration.md)
-* [Convert to Pytantic](guides/pydantic.md)
+# Validate data
+try:
+    valid_user = user_schema.validate({
+        "username": "  johndoe  ",  # Will be trimmed
+        "email": "john@example.com",
+        "tags": ["python", "validation"]
+    })
+    print(valid_user)
+except ValueError as e:
+    print(f"Validation error: {e}")
 
-## Additional Resources
+# Async validation
+import asyncio
 
-* [GitHub Repository](https://github.com/nexios/sift)
-* [PyPI Package](https://pypi.org/project/sift-validator/)
-* [Examples](docs/examples/)
+async def validate_user_async():
+    try:
+        valid_user = await user_schema.validate_async({
+            "username": "johndoe",
+            "email": "john@example.com",
+            "tags": ["python", "validation"]
+        })
+        print(valid_user)
+    except ValueError as e:
+        print(f"Validation error: {e}")
+
+asyncio.run(validate_user_async())
+```
+
+## OpenAPI Integration
+
+```python
+from sift import String, Number, Object
+from sift.openapi import generate_openapi_schema
+
+user_schema = Object({
+    "username": String().min(3).max(20),
+    "email": String().email(),
+    "age": Number().int().min(18),
+})
+
+# Generate OpenAPI schema
+openapi_schema = generate_openapi_schema(user_schema)
+print(openapi_schema)
+```
+
+## License
+
+BSD-3-CLAUSE
+

@@ -77,5 +77,5 @@ print(openapi_schema)
 
 ## License
 
-MIT
+BSD-3-CLAUSE
 
