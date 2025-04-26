@@ -1,0 +1,16 @@
+# GitBook Configuration
+
+root: ./
+
+# Structure file that contains the Table of Contents
+structure:
+  readme: README.md
+  summary: SUMMARY.md
+
+# Redirect URLs
+redirects:
+  previous/page: new-page.md
+
+# Custom asset folders
+assets: .gitbook/assets
+

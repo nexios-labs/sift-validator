@@ -104,13 +104,21 @@ class OpenAPISchemaGenerator:
         elif isinstance(validator, AnyValidator):
             schema = {}  # No restrictions
             
-        # Check if this is a custom validator that inherits from Object
+        # Check if this is an Object validator or a custom validator that inherits from Object
         elif hasattr(validator, "_schema") and callable(getattr(validator, "_validate", None)):
-            # This is likely a custom validator class that inherits from Object
+            # This is likely an Object validator or a custom validator class that inherits from Object
             # Try to get its schema
             try:
-                schema = self._generate_object_schema(validator)
-            except AttributeError:
+                # Import here to avoid circular import issues
+                from sift.validators.objects import Object
+                
+                # Check if it's an Object validator instance
+                if isinstance(validator, Object):
+                    schema = self._generate_object_schema(validator)
+                else:
+                    # It's a custom validator with schema attribute
+                    schema = self._generate_object_schema(validator)
+            except (AttributeError, ImportError):
                 # Fall back to empty schema
                 schema = {}
         
@@ -199,8 +207,8 @@ class OpenAPISchemaGenerator:
             
         return schema
         
-    def _generate_object_schema(self, validator: DictValidator) -> Dict[str, Any]:
-        """Generate OpenAPI schema for Dict validator."""
+    def _generate_object_schema(self, validator) -> Dict[str, Any]:
+        """Generate OpenAPI schema for Dict or Object validator."""
         schema: Dict[str, Any] = {"type": "object"}
         
         # Get the schema dict - different attribute name depending on the class
@@ -358,4 +366,5 @@ def generate_openapi_components(validator: Validator, schema_name: str) -> Dict[
     generator = OpenAPISchemaGenerator()
     generator.generate_schema(validator, schema_name)
     return generator.get_components_schemas()
+
 

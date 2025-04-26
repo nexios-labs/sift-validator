@@ -15,6 +15,9 @@ This example demonstrates:
 import sys
 from pathlib import Path
 
+from sift.openapi.schema import generate_schema
+from sift.pydantic_converter import convert_sift_to_pydantic
+
 # Add the parent directory to the Python path to import sift
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -48,7 +51,7 @@ def demonstrate_string_validation():
         result = validator.validate("not-an-email")
         print(f"Email validation: {result}")
     except ValidationError as e:
-        print(f"Custom error message: {e}")  # Output: Custom error message: Invalid email address
+        print(f"Custom error message: {e.error_dict}")  # Output: Custom error message: Invalid email address
 
 
 def demonstrate_number_validation():
@@ -66,7 +69,7 @@ def demonstrate_number_validation():
         result = validator.validate(3.14)
         print(f"Integer validation: {result}")
     except ValidationError as e:
-        print(f"Integer validation error: {e}")  # Output: Number must be an integer
+        print(f"Integer validation error: {e.error_dict}")  # Output: Number must be an integer
     
     # Range validation
     validator = Number().min(0).max(100)
@@ -77,7 +80,7 @@ def demonstrate_number_validation():
         result = validator.validate(101)
         print(f"Range validation (should fail): {result}")
     except ValidationError as e:
-        print(f"Range validation error: {e}")  # Output: Number must be at most 100
+        print(f"Range validation error: {e.error_dict}")  # Output: Number must be at most 100
     
     # Positive/negative validation
     validator = Number().positive()
@@ -85,7 +88,7 @@ def demonstrate_number_validation():
         result = validator.validate(-5)
         print(f"Positive validation: {result}")
     except ValidationError as e:
-        print(f"Positive validation error: {e}")  # Output: Number must be positive (> 0)
+        print(f"Positive validation error: {e.error_dict}")  # Output: Number must be positive (> 0)
     
     # Multiple of validation
     validator = Number().multiple_of(5)
@@ -96,7 +99,7 @@ def demonstrate_number_validation():
         result = validator.validate(7)
         print(f"Multiple of validation (should fail): {result}")
     except ValidationError as e:
-        print(f"Multiple of validation error: {e}")  # Output: Number must be a multiple of 5
+        print(f"Multiple of validation error: {e.error_dict}")  # Output: Number must be a multiple of 5
 
 
 def demonstrate_boolean_validation():
@@ -137,7 +140,7 @@ def demonstrate_collection_validation():
         result = list_validator.validate([1])
         print(f"List constraint validation: {result}")
     except ValidationError as e:
-        print(f"List constraint error: {e}")  # Output: List must have at least 2 items
+        print(f"List constraint error: {e.error_dict}")  # Output: List must have at least 2 items
     
     # Unique items
     list_validator = List(String()).unique()
@@ -145,7 +148,7 @@ def demonstrate_collection_validation():
         result = list_validator.validate(["a", "b", "a"])
         print(f"Unique validation: {result}")
     except ValidationError as e:
-        print(f"Unique validation error: {e}")  # Output: List items must be unique
+        print(f"Unique validation error: {e.error_dict}")  # Output: List items must be unique
         
     # Dictionary validation
     dict_validator = Dict({
@@ -201,7 +204,7 @@ def demonstrate_collection_validation():
         result = user_schema.validate(invalid_user)
         print(f"Nested validation (should fail): {result}")
     except ValidationError as e:
-        print(f"Nested validation error: {e}")  # Output: address.zipcode: String does not match pattern: ^\d{5}$
+        print(f"Nested validation error: {e.error_dict}")  # Output: address.zipcode: String does not match pattern: ^\d{5}$
     
     # Tuple validation
     point_validator = Tuple([Number(), Number(), String()])
@@ -243,7 +246,7 @@ def demonstrate_object_validation():
         result = user_schema.validate(invalid_user)
         print(f"Invalid object: {result}")
     except ValidationError as e:
-        print(f"Object validation error: {e}")  # Expected to show error
+        print(f"Object validation error: {e.error_dict}")  # Expected to show error
 
 
 def demonstrate_error_handling():
@@ -286,7 +289,7 @@ def demonstrate_error_handling():
         result = user_schema.validate(invalid_data)
         print(f"Result: {result}")
     except ValidationError as e:
-        print(f"Nested validation error: {e}")
+        print(f"Nested validation error: {e.error_dict}")
         # Expected to show errors about country and postal code
 
 
@@ -297,3 +300,19 @@ if __name__ == "__main__":
     demonstrate_collection_validation()
     demonstrate_object_validation()
     demonstrate_error_handling()
+
+    print(generate_schema (Object({
+        "name": String().min(1),
+        "age": Number().int().min(0),
+        "email": String().email(),
+        "is_active": Boolean().default(True)
+    }), "UserSchema"))
+
+    model = convert_sift_to_pydantic(Object({
+        "name": String().min(1),
+        "age": Number().int().min(0),
+        "email": String().email(),
+        "is_active": Boolean().default(True)
+    }), "UserSchema")
+
+    print(model)  # Print the Pydantic model schema in JSON format

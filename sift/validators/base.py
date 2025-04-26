@@ -17,14 +17,46 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 class ValidationError(ValueError):
-    """Error raised when validation fails."""
+    """Error raised when validation fails.
     
-    def __init__(self, message: str, path: Optional[list[str | int]] = None):
+    This class supports both simple error messages with paths and 
+    dictionary-style error handling with field-error pairs.
+    """
+    
+    def __init__(self, message: Optional[str] = None, path: Optional[list[str | int]] = None, errors: Optional[dict[str, str]] = None):
+        self.errors: dict[str, str] = errors or {}
         self.path = path or []
-        self.message = message
-        path_str = ".".join(str(p) for p in self.path) if self.path else ""
-        super().__init__(f"{path_str}: {message}" if path_str else message)
-
+        
+        # For backwards compatibility
+        self.message = message or ""
+        
+        # If message and path are provided, add them to the errors dict
+        if message:
+            field = ".".join(str(p) for p in self.path) if self.path else "_base"
+            self.errors[field] = message
+        
+        # Format the error message for the ValueError constructor
+        super().__init__(self._format_error_message())
+    
+    def _format_error_message(self) -> str:
+        """Format the errors dictionary into a readable error message."""
+        if not self.errors:
+            return "Validation failed"
+            
+        return "\n".join(f"{field}: {message}" for field, message in self.errors.items())
+    
+    def add_error(self, field: str, message: str) -> None:
+        """Add a new field error."""
+        self.errors[field] = message
+        
+    def merge(self, other: 'ValidationError') -> None:
+        """Merge another ValidationError's errors into this one."""
+        self.errors.update(other.errors)
+        
+    @property
+    def error_dict(self) -> dict[str, str]:
+        """Get the errors as a dictionary."""
+        return self.errors.copy()
 
 class Validator(Generic[T, R]):
     """
@@ -91,7 +123,13 @@ class Validator(Generic[T, R]):
             return error
         
         # Create a new error with the custom message but preserve the path
-        return ValidationError(self._custom_error_message, error.path)
+        if error.errors and len(error.errors) > 1:
+            # If there are multiple errors, wrap them all with the custom message
+            all_errors = {k: self._custom_error_message for k in error.errors.keys()}
+            return ValidationError(errors=all_errors)
+        else:
+            # For single error or simple case, use the traditional approach
+            return ValidationError(self._custom_error_message, error.path)
     
     def _resolve_default(self) -> T:
         """Resolve the default value, handling callable defaults."""
