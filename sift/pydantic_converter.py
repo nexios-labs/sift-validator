@@ -4,6 +4,68 @@ Utility for converting Sift schemas to Pydantic models.
 This module provides functionality to convert Sift validator schemas 
 into equivalent Pydantic model classes with appropriate type hints
 and validation constraints.
+
+## Overview
+
+The SIFT validator system provides a flexible way to validate data using
+a chainable API. Pydantic is a popular data validation library in the Python
+ecosystem. This module bridges the gap between SIFT validators and Pydantic
+models, allowing you to:
+
+1. Define your data schemas using SIFT validators
+2. Convert those schemas to Pydantic models for use with other Pydantic-compatible libraries
+3. Leverage both systems depending on your needs
+
+## Basic Usage
+
+```python
+from sift.validators.primitives import String, Number, Boolean
+from sift.validators.objects import Object
+from sift.pydantic_converter import convert_schema
+
+# Define a SIFT schema
+user_schema = {
+    "username": String().min(3).max(20),
+    "age": Number().int().min(0),
+    "is_active": Boolean().default(True)
+}
+
+# Convert to a Pydantic model
+UserModel = convert_schema(user_schema, "UserModel")
+
+# Use the Pydantic model
+user = UserModel(username="john_doe", age=25)
+print(user.dict())  # {"username": "john_doe", "age": 25, "is_active": True}
+```
+
+## Conversion Features
+
+The converter supports:
+
+- Basic validator types (String, Number, Boolean)
+- Complex validators (List, Dict, Tuple, Union)
+- Nested objects with complex structure
+- Optional and nullable fields
+- Default values (including callable defaults)
+- Validation constraints (min/max length, regex patterns, etc.)
+
+### Validator Type Mapping
+
+| SIFT Validator | Pydantic/Python Type |
+|----------------|----------------------|
+| String         | str                  |
+| String().email() | EmailStr           |
+| Number         | float                |
+| Number().int() | int                  |
+| Boolean        | bool                 |
+| List(String()) | List[str]            |
+| Object         | BaseModel subclass   |
+| Dict           | Dict[str, Any] or BaseModel |
+| Union          | Union[...]           |
+| Null           | Optional[Any]        |
+| Any            | Any                  |
+
+For more complex examples and specific usage patterns, see the examples below.
 """
 
 from typing import Any, Dict, List as ListType, Optional, Set, Tuple, Type, Union as UnionType, get_type_hints
@@ -25,6 +87,39 @@ class SchemaConverter:
     
     This class analyzes Sift validators and their chain modifiers to create
     equivalent Pydantic model classes with proper type hints and validation.
+    
+    The converter handles:
+    - Basic types (String, Number, Boolean)
+    - Collection types (List, Dict, Tuple)
+    - Union types for polymorphic data
+    - Nested object structures
+    - Optional and nullable fields
+    - Default values including callable defaults
+    - Validation constraints (min/max length, numeric ranges, patterns, etc.)
+    
+    The conversion process preserves as much type information and validation logic
+    as possible while mapping to Pydantic's validation system.
+    
+    Example:
+        ```python
+        from sift.validators.primitives import String, Number
+        from sift.validators.objects import Object
+        
+        # Create a converter instance
+        converter = SchemaConverter()
+        
+        # Define a schema and convert it
+        schema = {
+            "name": String(),
+            "age": Number().int()
+        }
+        
+        # Convert to a Pydantic model
+        UserModel = converter.convert_schema(schema, "UserModel")
+        
+        # Use the model
+        user = UserModel(name="John", age=30)
+        ```
     """
     
     def __init__(self):
@@ -324,31 +419,258 @@ class SchemaConverter:
 
 
 
-def convert_object(schema: Dict[str, Validator], model_name: str = "GeneratedModel") -> Type[BaseModel]:
+# Example demonstrating complete conversion from SIFT to Pydantic
+"""
+The following example demonstrates a more complex conversion from SIFT validators
+to Pydantic models, including nested objects, lists, and various constraints.
+
+```python
+from sift.validators.primitives import String, Number, Boolean
+from sift.validators.collections import List, Dict
+from sift.validators.objects import Object
+from sift.pydantic_converter import convert_schema
+
+# Define a nested address schema
+address_schema = {
+    "street": String().max(100),
+    "city": String(),
+    "zip_code": String().pattern(r'^\d{5}$').error("Zip code must be 5 digits"),
+    "country": String().default("USA")
+}
+
+# Define the main user schema with nested objects and lists
+user_schema = {
+    "username": String().min(3).max(20),
+    "email": String().email().error("Invalid email format"),
+    "age": Number().int().min(18).error("Must be at least 18 years old"),
+    "is_active": Boolean().default(True),
+    "tags": List(String()).optional(),
+    "address": Object(address_schema),
+    "previous_addresses": List(Object(address_schema)).optional()
+}
+
+# Convert to a Pydantic model
+UserModel = convert_schema(user_schema, "UserModel")
+
+# Create a user instance with the model
+user = UserModel(
+    username="john_doe",
+    email="john@example.com",
+    age=25,
+    address={
+        "street": "123 Main St",
+        "city": "Anytown",
+        "zip_code": "12345"
+    },
+    previous_addresses=[
+        {
+            "street": "456 Old Road",
+            "city": "Oldtown",
+            "zip_code": "67890"
+        }
+    ]
+)
+
+# Access the data in a structured way
+print(user.username)  # "john_doe"
+print(user.address.street)  # "123 Main St"
+print(user.dict())  # Full user object as dict
+```
+
+The converter handles:
+- Validation constraints (String length, Number range, etc.)
+- Default values (country="USA", is_active=True)
+- Optional fields (tags, previous_addresses)
+- Nested object structures
+- List of primitive types or complex objects
+"""
+
+def convert_object(obj_validator: Object, model_name: str = "GeneratedModel") -> Type[BaseModel]:
     """
-    Convert a Sift schema to a Pydantic model class.
+    Convert a Sift Object validator to a Pydantic model class.
+    
+    This function takes a SIFT Object validator instance and creates an equivalent
+    Pydantic model class with all fields and validations properly mapped.
     
     Args:
-        schema: Dictionary mapping field names to Sift validators
+        obj_validator: SIFT Object validator instance containing a schema
         model_name: Name for the generated Pydantic model class
     
     Returns:
-        Type[BaseModel]: Generated Pydantic model class
+        Type[BaseModel]: A generated Pydantic model class that can be instantiated
+            with data matching the schema defined in the Object validator
+    
+    Example:
+        ```python
+        from sift.validators.primitives import String, Number
+        from sift.validators.objects import Object
+        from sift.pydantic_converter import convert_object
+        
+        # Create an Object validator
+        user_validator = Object({
+            "username": String().min(3),
+            "age": Number().int().min(0)
+        })
+        
+        # Convert to Pydantic model
+        UserModel = convert_object(user_validator, "UserModel")
+        
+        # Use the model
+        user = UserModel(username="john", age=25)
+        ```
     """ 
     converter = SchemaConverter()
-    return converter.convert_object(schema, model_name)
+    return converter.convert_object(obj_validator, model_name)
 
 def convert_schema(schema: Dict[str, Validator], model_name: str = "GeneratedModel") -> Type[BaseModel]:
     """
-    Convert a Sift schema to a Pydantic model class.
+    Convert a Sift schema dictionary to a Pydantic model class.
+    
+    This function is the main entry point for converting SIFT validator schemas
+    directly to Pydantic models. It handles all validator types, nested structures,
+    and validation constraints.
     
     Args:
         schema: Dictionary mapping field names to Sift validators
         model_name: Name for the generated Pydantic model class
     
     Returns:
-        Type[BaseModel]: Generated Pydantic model class
+        Type[BaseModel]: A generated Pydantic model class that can be instantiated
+            with data matching the schema defined in the dictionary
+    
+    Example:
+        ```python
+        from sift.validators.primitives import String, Number, Boolean
+        from sift.pydantic_converter import convert_schema
+        
+        # Define a schema dictionary
+        schema = {
+            "name": String().min(2),
+            "age": Number().int().min(0).optional(),
+            "is_active": Boolean().default(True)
+        }
+        
+        # Convert to Pydantic model
+        PersonModel = convert_schema(schema, "PersonModel")
+        
+        # Create instances
+        person1 = PersonModel(name="Alice", age=30)
+        person2 = PersonModel(name="Bob")  # age is optional
+        
+        # ValidationError would be raised for:
+        # PersonModel(age=25)  # missing required name
+        # PersonModel(name="C")  # name too short
+        ```
+    
+    Notes:
+        - Optional validators are converted to Optional[Type] in Python's typing system
+        - Nullable validators also use Optional[Type] but semantically allow None values
+        - Default values are preserved in the Pydantic model
+        - Validator constraints are mapped to Pydantic's validation system
     """ 
     converter = SchemaConverter()
     return converter.convert_schema(schema, model_name)
+
+# Additional documentation on SIFT to Pydantic type conversion
+"""
+## Detailed Conversion Reference
+
+### Basic Types
+
+SIFT String validators convert to Python's `str` type with appropriate constraints:
+```python
+# SIFT
+name = String().min(2).max(50)
+
+# Pydantic equivalent
+name: str = Field(..., min_length=2, max_length=50)
+```
+
+SIFT Number validators map to either `int` or `float` based on configuration:
+```python
+# SIFT
+count = Number().int().min(0)
+amount = Number().min(0.01).max(1000)
+
+# Pydantic equivalent
+count: int = Field(..., ge=0)
+amount: float = Field(..., ge=0.01, le=1000)
+```
+
+SIFT Boolean validators map directly to Python's `bool`:
+```python
+# SIFT
+is_active = Boolean().default(True)
+
+# Pydantic equivalent
+is_active: bool = Field(True)
+```
+
+### Optional and Nullable Fields
+
+Both optional and nullable use Python's `Optional` type:
+```python
+# SIFT
+optional_field = String().optional()
+nullable_field = String().nullable()
+
+# Pydantic equivalent
+optional_field: Optional[str] = None
+nullable_field: Optional[str] = Field(...)
+```
+
+### Collection Types
+
+Lists with item validation:
+```python
+# SIFT
+tags = List(String())
+
+# Pydantic equivalent
+tags: List[str] = Field(...)
+```
+
+Dictionaries map to either Dict[str, Any] or nested models:
+```python
+# SIFT
+metadata = Dict()  # Untyped dictionary
+
+# Pydantic equivalent
+metadata: Dict[str, Any] = Field(...)
+```
+
+### Nested Objects
+
+Object validators create nested Pydantic models:
+```python
+# SIFT
+address = Object({
+    "street": String(),
+    "city": String(),
+    "zip": String()
+})
+
+# Pydantic equivalent
+class AddressModel(BaseModel):
+    street: str
+    city: str
+    zip: str
+
+# And used as:
+address: AddressModel = Field(...)
+```
+
+### Union Types
+
+Union validators create Python Union types:
+```python
+# SIFT
+id_field = Union([String(), Number().int()])
+
+# Pydantic equivalent
+id_field: Union[str, int] = Field(...)
+```
+
+For more details on specific conversion logic, refer to the SchemaConverter class implementation.
+"""
 

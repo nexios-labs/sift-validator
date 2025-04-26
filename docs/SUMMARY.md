@@ -23,6 +23,7 @@
 
 * [Integration](deployment/integration.md)
 * [Framework Integration](deployment/framework-integration.md)
+* [Convert to Pytantic](guides/pydantic.md)
 
 ## Additional Resources
 
