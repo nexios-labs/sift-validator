@@ -1,25 +1,27 @@
-![Voltar  Logo](./assets/logo.png)
+# Home
 
-# Voltar 
+![Voltar  Logo](.gitbook/assets/logo.svg)
+
+## Voltar
 
 A modern Python validation library with Zod-like syntax, async support, and OpenAPI integration.
 
-## Features
+### Features
 
-- 🔄 **Chainable API**: Intuitive, fluent interface for building validation schemas
-- ⚡ **Async Support**: Fast, non-blocking validation for high-performance applications
-- 📝 **Type Hints**: Comprehensive typing for excellent editor integration
-- 📊 **OpenAPI**: Seamless generation of OpenAPI schemas from your validators
-- 🔍 **Powerful Validation**: Built-in validators for common use cases with custom validation support
-- 🔧 **Data Transformation**: Transform and normalize data during validation
+* 🔄 **Chainable API**: Intuitive, fluent interface for building validation schemas
+* ⚡ **Async Support**: Fast, non-blocking validation for high-performance applications
+* 📝 **Type Hints**: Comprehensive typing for excellent editor integration
+* 📊 **OpenAPI**: Seamless generation of OpenAPI schemas from your validators
+* 🔍 **Powerful Validation**: Built-in validators for common use cases with custom validation support
+* 🔧 **Data Transformation**: Transform and normalize data during validation
 
-## Installation
+### Installation
 
 ```bash
 pip install voltar 
 ```
 
-## Quick Start
+### Quick Start
 
 ```python
 from voltar  import String, Number, Object, List
@@ -60,7 +62,7 @@ async def validate_user_async():
 asyncio.run(validate_user_async())
 ```
 
-## OpenAPI Integration
+### OpenAPI Integration
 
 ```python
 from voltar  import String, Number, Object
@@ -77,7 +79,6 @@ openapi_schema = generate_openapi_schema(user_schema)
 print(openapi_schema)
 ```
 
-## License
+### License
 
 BSD-3-CLAUSE
-
