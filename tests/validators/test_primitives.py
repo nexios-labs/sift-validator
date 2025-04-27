@@ -6,8 +6,8 @@ import pytest
 import re
 from datetime import datetime, date
 
-from sift.validators.base import ValidationError
-from sift.validators.primitives import String, Number, Boolean, Any, Null
+from voltar .validators.base import ValidationError
+from voltar .validators.primitives import String, Number, Boolean, Any, Null
 
 
 class TestStringValidator:

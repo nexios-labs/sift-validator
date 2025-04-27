@@ -1,6 +1,6 @@
 # Async Validation
 
-This guide covers Sift's asynchronous validation capabilities, which are essential for high-performance applications and systems that need to validate data from asynchronous sources such as databases or external APIs.
+This guide covers Voltar 's asynchronous validation capabilities, which are essential for high-performance applications and systems that need to validate data from asynchronous sources such as databases or external APIs.
 
 ## Asynchronous Validation Basics
 
@@ -15,11 +15,11 @@ Asynchronous validation is useful when:
 
 ### Basic Usage
 
-All Sift validators support async validation through the `validate_async` method:
+All Voltar  validators support async validation through the `validate_async` method:
 
 ```python
 import asyncio
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 # Define a schema
 user_schema = Object({
@@ -51,7 +51,7 @@ By default, `validate_async` will call the synchronous `validate` method within 
 
 ```python
 import asyncio
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, List
 
 class ExternalApiValidator(Validator[str, bool]):
@@ -96,7 +96,7 @@ Here's how to create a custom validator with async capabilities:
 
 ```python
 import asyncio
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, List
 
 class AsyncEmailValidator(Validator[str, str]):
@@ -187,7 +187,7 @@ A common use case is validating data against a database:
 ```python
 import asyncio
 import aiomysql  # Example async database driver
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, List
 
 class UniqueUsernameValidator(Validator[str, str]):
@@ -274,8 +274,8 @@ For independent fields, you can validate them in parallel:
 
 ```python
 import asyncio
-from sift import String, Number
-from sift.validators.base import ValidationError
+from voltar  import String, Number
+from voltar .validators.base import ValidationError
 from typing import Dict, Any
 
 async def validate_fields_parallel(data: Dict[str, Any], validators: Dict[str, Any]):
@@ -345,7 +345,7 @@ For expensive validations, consider caching results:
 ```python
 import asyncio
 import functools
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, List, Dict, Optional
 
 class CachedAsyncValidator(Validator):
@@ -378,7 +378,7 @@ class CachedAsyncValidator(Validator):
 
 # Example usage
 async def demonstrate_caching():
-    from sift import String
+    from voltar  import String
     
     # Create an expensive validator (simulated)
     class ExpensiveValidator(String):
@@ -412,17 +412,17 @@ asyncio.run(demonstrate_caching())
 
 ### Integration with FastAPI
 
-FastAPI is a popular async web framework that works well with Sift's async validation:
+FastAPI is a popular async web framework that works well with Voltar 's async validation:
 
 ```python
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from sift import Object, String, Number
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number
+from voltar .validators.base import ValidationError
 
 app = FastAPI()
 
-# Define Sift validator
+# Define Voltar  validator
 user_schema = Object({
     "username": String().min(3).max(50),
     "email": String().email(),
@@ -441,7 +441,7 @@ async def create_user(user: UserModel):
         # Convert Pydantic model to dict
         user_data = user.dict()
         
-        # Validate with Sift
+        # Validate with Voltar 
         validated_user = await user_schema.validate_async(user_data)
         
         # Process the validated user...
@@ -449,7 +449,7 @@ async def create_user(user: UserModel):
         
         return {"status": "success", "user": validated_user}
     except ValidationError as e:
-        # Convert Sift validation error to FastAPI HTTP exception
+        # Convert Voltar  validation error to FastAPI HTTP exception
         error_details = [{"field": ".".join(err.path), "message": err.message} for err in e.errors]
         raise HTTPException(status_code=422, detail=error_details)
 
@@ -459,15 +459,15 @@ async def create_user(user: UserModel):
 
 ### Integration with Async Database (SQLAlchemy)
 
-Using Sift with SQLAlchemy's async capabilities:
+Using Voltar  with SQLAlchemy's async capabilities:
 
 ```python
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import Column, Integer, String
-from sift import Object, String, Number
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number
+from voltar .validators.base import ValidationError
 
 # Define SQLAlchemy models
 Base = declarative_base()
@@ -480,7 +480,7 @@ class User(Base):
     email = Column(String)
     age = Column(Integer)
 
-# Define Sift validator
+# Define Voltar  validator
 user_schema = Object({
     "username": String().min(3).max(50),
     "email": String().email(),

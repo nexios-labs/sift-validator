@@ -6,7 +6,7 @@ import pytest
 import asyncio
 from typing import Any, Optional
 
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
 
 class TestValidator:
@@ -220,7 +220,7 @@ Tests for the base validator functionality.
 
 import pytest
 import asyncio
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
 
 def test_validator_optional():

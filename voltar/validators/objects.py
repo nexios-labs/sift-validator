@@ -3,8 +3,8 @@ Object validator for class instances and typed dictionaries.
 """
 
 from typing import Any, Dict, Type, Optional, get_type_hints
-from sift.validators.base import Validator, ValidationError
-from sift.validators.collections import Dict as DictValidator
+from voltar .validators.base import Validator, ValidationError
+from voltar .validators.collections import Dict as DictValidator
 
 class Object(Validator[Dict[str, Any], Dict[str, Any]]):
     """

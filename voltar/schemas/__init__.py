@@ -6,7 +6,7 @@ definitions and compositions.
 """
 
 # Import schema-related functions and classes here
-# Example: from sift.schemas.composition import merge_schemas, extend_schema
+# Example: from voltar .schemas.composition import merge_schemas, extend_schema
 
 __all__ = [
     # List schema-related exports here

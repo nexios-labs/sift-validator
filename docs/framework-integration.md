@@ -1,20 +1,20 @@
 # Framework Integration
 
-This guide provides detailed instructions for integrating Sift into popular web frameworks through middleware and framework-specific patterns.
+This guide provides detailed instructions for integrating Voltar  into popular web frameworks through middleware and framework-specific patterns.
 
 ## FastAPI Integration
 
-FastAPI provides excellent support for validation and has multiple ways to integrate with Sift.
+FastAPI provides excellent support for validation and has multiple ways to integrate with Voltar .
 
 ### Dependency Injection Approach
 
-The recommended way to integrate Sift with FastAPI is through its dependency injection system:
+The recommended way to integrate Voltar  with FastAPI is through its dependency injection system:
 
 ```python
 from fastapi import FastAPI, Depends, HTTPException, Request
 from typing import Dict, Any, Type, TypeVar
-from sift import Object, String, Number, Boolean
-from sift.validators.base import Validator, ValidationError
+from voltar  import Object, String, Number, Boolean
+from voltar .validators.base import Validator, ValidationError
 
 app = FastAPI()
 
@@ -27,7 +27,7 @@ def validate_request_body(schema: Type[Validator]):
             # Get JSON data from request
             body = await request.json()
             
-            # Validate with Sift
+            # Validate with Voltar 
             validated_data = await schema.validate_async(body)
             return validated_data
         except ValidationError as e:
@@ -69,7 +69,7 @@ For global validation behavior, you can implement a middleware:
 from fastapi import FastAPI, Request
 from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
-from sift.validators.base import ValidationError
+from voltar .validators.base import ValidationError
 import inspect
 from typing import Callable, Dict, Type
 
@@ -78,8 +78,8 @@ app = FastAPI()
 # Store schema mapping
 endpoint_schemas: Dict[str, Type[Validator]] = {}
 
-# Custom route class that supports Sift schemas
-class SiftValidatedRoute(APIRoute):
+# Custom route class that supports Voltar  schemas
+class Voltar ValidatedRoute(APIRoute):
     def get_route_handler(self) -> Callable:
         original_route_handler = super().get_route_handler()
         
@@ -118,7 +118,7 @@ class SiftValidatedRoute(APIRoute):
         return custom_route_handler
 
 # Configure app to use custom route class
-app.router.route_class = SiftValidatedRoute
+app.router.route_class = Voltar ValidatedRoute
 
 # Decorator to register a schema for an endpoint
 def validate_with(schema):
@@ -129,7 +129,7 @@ def validate_with(schema):
     return decorator
 
 # Example usage
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 @app.post("/products/")
 @validate_with(Object({
@@ -144,23 +144,23 @@ async def create_product(request: Request):
 
 ### Integration with Pydantic
 
-FastAPI uses Pydantic models for validation by default, but you can combine them with Sift:
+FastAPI uses Pydantic models for validation by default, but you can combine them with Voltar :
 
 ```python
 from fastapi import FastAPI, Body
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional
-from sift import Object, String, Number, List as SiftList
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number, List as Voltar List
+from voltar .validators.base import ValidationError
 
 app = FastAPI()
 
-# Define Sift schema
-user_sift_schema = Object({
+# Define Voltar  schema
+user_voltar _schema = Object({
     "username": String().min(3).max(50),
     "email": String().email(),
     "age": Number().int().min(18),
-    "tags": SiftList(String()).optional()
+    "tags": Voltar List(String()).optional()
 })
 
 # Pydantic model for documentation and serialization
@@ -170,9 +170,9 @@ class User(BaseModel):
     age: int = Field(..., ge=18)
     tags: Optional[List[str]] = None
     
-    # Use Sift for validation
+    # Use Voltar  for validation
     @validator('*', pre=True)
-    def validate_with_sift(cls, value, values):
+    def validate_with_voltar (cls, value, values):
         # For a real implementation, you would validate the complete input
         # This is just a simplified example
         try:
@@ -183,7 +183,7 @@ class User(BaseModel):
                 "tags": values.get("tags", [])
             }
             if value == data["username"]:
-                user_sift_schema.validate(data)
+                user_voltar _schema.validate(data)
             return value
         except ValidationError as e:
             raise ValueError(str(e))
@@ -197,12 +197,12 @@ async def create_user(user: User):
 
 ### Request Validation Decorator
 
-A clean way to integrate Sift with Flask is through decorators:
+A clean way to integrate Voltar  with Flask is through decorators:
 
 ```python
 from flask import Flask, request, jsonify, g
 from functools import wraps
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
 app = Flask(__name__)
 
@@ -220,7 +220,7 @@ def validate_json(schema):
                 return jsonify({"error": "Invalid JSON"}), 400
                 
             try:
-                # Validate with Sift
+                # Validate with Voltar 
                 validated_data = schema.validate(data)
                 
                 # Store validated data for the view
@@ -237,7 +237,7 @@ def validate_json(schema):
     return decorator
 
 # Usage with route
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 @app.route('/users', methods=['POST'])
 @validate_json(Object({
@@ -261,7 +261,7 @@ For global validation, implement a middleware that validates based on route conf
 
 ```python
 from flask import Flask, request, jsonify, g
-from sift.validators.base import ValidationError
+from voltar .validators.base import ValidationError
 
 app = Flask(__name__)
 
@@ -304,7 +304,7 @@ def validate_request():
         return jsonify({"errors": error_details}), 422
 
 # Example usage
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 # Register schema for user creation
 register_schema(
@@ -328,12 +328,12 @@ def create_user():
 
 ### Flask Class-Based Views Integration
 
-For more organized code, use class-based views with Sift:
+For more organized code, use class-based views with Voltar :
 
 ```python
 from flask import Flask, jsonify, request
 from flask.views import MethodView
-from sift.validators.base import ValidationError
+from voltar .validators.base import ValidationError
 
 app = Flask(__name__)
 
@@ -365,7 +365,7 @@ class ValidatedMethodView(MethodView):
         return super().dispatch_request(*args, **kwargs)
 
 # Example usage
-from sift import Object, String, Number, Boolean
+from voltar  import Object, String, Number, Boolean
 
 class UserAPI(ValidatedMethodView):
     schemas = {
@@ -398,15 +398,15 @@ app.add_url_rule('/users/<int:user_id>', view_func=UserAPI.as_view('update_user'
 
 ### Django REST Framework Integration
 
-Integrate Sift with Django REST Framework for API validation:
+Integrate Voltar  with Django REST Framework for API validation:
 
 ```python
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
-class SiftValidatedView(APIView):
+class Voltar ValidatedView(APIView):
     schema = None  # Override in subclasses
     
     def validate_request(self, request):
@@ -437,9 +437,9 @@ class SiftValidatedView(APIView):
         return super().dispatch(request, *args, **kwargs)
 
 # Example usage
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
-class UserView(SiftValidatedView):
+class UserView(Voltar ValidatedView):
     schema = Object({
         "username": String().min(3).max(50),
         "email": String().email(),
@@ -463,9 +463,9 @@ For global request validation, implement a Django middleware:
 ```python
 from django.http import JsonResponse
 import json
-from sift.validators.base import ValidationError
+from voltar .validators.base import ValidationError
 
-class SiftValidationMiddleware:
+class Voltar ValidationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         # Initialize route schemas
@@ -513,23 +513,23 @@ class SiftValidationMiddleware:
 """
 MIDDLEWARE = [
     # ...
-    'myapp.middleware.SiftValidationMiddleware',
+    'myapp.middleware.Voltar ValidationMiddleware',
     # ...
 ]
 """
 
 # In a registry or app initialization
 from django.apps import AppConfig
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 class MyAppConfig(AppConfig):
     name = 'myapp'
     
     def ready(self):
-        from myapp.middleware import SiftValidationMiddleware
+        from myapp.middleware import Voltar ValidationMiddleware
         
         # Register schemas for routes
-        SiftValidationMiddleware.route_schemas = {
+        Voltar ValidationMiddleware.route_schemas = {
             "POST:/api/users": Object({
                 "username": String().min(3).max(50),
                 "email": String().email(),
@@ -544,29 +544,29 @@ class MyAppConfig(AppConfig):
 
 ### Django Form Integration
 
-You can also integrate Sift with Django Forms for hybrid validation:
+You can also integrate Voltar  with Django Forms for hybrid validation:
 
 ```python
 from django import forms
 from django.core.exceptions import ValidationError as DjangoValidationError
-from sift import Object, String, Number
-from sift.validators.base import ValidationError as SiftValidationError
+from voltar  import Object, String, Number
+from voltar .validators.base import ValidationError as Voltar ValidationError
 
-class SiftModelForm(forms.ModelForm):
-    """A ModelForm that also uses Sift for validation."""
+class Voltar ModelForm(forms.ModelForm):
+    """A ModelForm that also uses Voltar  for validation."""
     
-    sift_schema = None  # Override in subclasses
+    voltar _schema = None  # Override in subclasses
     
     def clean(self):
-        """Use Sift to validate the cleaned data."""
+        """Use Voltar  to validate the cleaned data."""
         cleaned_data = super().clean()
         
-        if self.sift_schema is not None:
+        if self.voltar _schema is not None:
             try:
-                # Validate with Sift
-                self.sift_schema.validate(cleaned_data)
-            except SiftValidationError as e:
-                # Convert Sift errors to Django form errors
+                # Validate with Voltar 
+                self.voltar _schema.validate(cleaned_data)
+            except Voltar ValidationError as e:
+                # Convert Voltar  errors to Django form errors
                 for err in e.errors:
                     field = err.path[0] if err.path else None
                     if field and field in self.fields:
@@ -579,13 +579,13 @@ class SiftModelForm(forms.ModelForm):
 # Example usage
 from django.contrib.auth.models import User
 
-class UserForm(SiftModelForm):
+class UserForm(Voltar ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
     
-    # Define Sift schema for additional validation
-    sift_schema = Object({
+    # Define Voltar  schema for additional validation
+    voltar _schema = Object({
         "username": String().min(3).pattern(r"^[a-zA-Z0-9_]+$"),
         "email": String().email(),
         "first_name": String().optional(),
@@ -595,16 +595,16 @@ class UserForm(SiftModelForm):
 
 ## Nexios Framework Integration
 
-[Nexios](https://nexios.io/) is a modern ASGI framework developed by the same team behind Sift, offering first-class integration.
+[Nexios](https://nexios.io/) is a modern ASGI framework developed by the same team behind Voltar , offering first-class integration.
 
 ### Basic Integration
 
-Sift is built into Nexios, making validation straightforward:
+Voltar  is built into Nexios, making validation straightforward:
 
 ```python
 from nexios import get_application
 from nexios.http import Request, Response
-from sift import Object, String, Number, Boolean
+from voltar  import Object, String, Number, Boolean
 
 app = get_application()
 
@@ -618,7 +618,7 @@ user_schema = Object({
 
 @app.post("/users")
 async def create_user(request: Request, response: Response):
-    # Validate with Sift
+    # Validate with Voltar 
     try:
         data = await request.json
         validated_data = await user_schema.validate_async(data)
@@ -639,12 +639,12 @@ async def create_user(request: Request, response: Response):
 
 ### Built-in Request Validation
 
-Nexios provides built-in request body validation with Sift:
+Nexios provides built-in request body validation with Voltar :
 
 ```python
 from nexios import get_application
 from nexios.http import Request, Response, validate_json
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 app = get_application()
 
@@ -673,17 +673,17 @@ async def create_user(request: Request, response: Response):
 
 ### Nexios Form Validation
 
-For form validation, Nexios provides form helpers built on Sift:
+For form validation, Nexios provides form helpers built on Voltar :
 
 ```python
 from nexios import get_application
 from nexios.http import Request, Response
 from nexios.forms import Form, field
-from sift import String, Number, Boolean
+from voltar  import String, Number, Boolean
 
 app = get_application()
 
-# Define a form with Sift validators
+# Define a form with Voltar  validators
 class UserForm(Form):
     username = field(String().min(3).max(50))
     email = field(String().email())
@@ -716,13 +716,13 @@ async def create_user(request: Request, response: Response):
 
 ### Nexios OpenAPI Integration
 
-Nexios can generate OpenAPI documentation from Sift schemas:
+Nexios can generate OpenAPI documentation from Voltar  schemas:
 
 ```python
 from nexios import get_application
 from nexios.http import Request, Response, validate_json
 from nexios.openapi import setup_openapi
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 app = get_application()
 
@@ -807,7 +807,7 @@ async def validation_exception_handler(request, exc):
 Provide user-friendly error messages for specific fields:
 
 ```python
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 # Use custom error messages for better UX
 user_schema = Object({
@@ -856,7 +856,7 @@ For complex schemas, use lazy initialization to avoid startup overhead:
 
 ```python
 from functools import lru_cache
-from sift import Object, String, Number, Boolean, List
+from voltar  import Object, String, Number, Boolean, List
 
 # Use a function to create schemas on demand
 @lru_cache(maxsize=None)  # Cache the created schema
@@ -896,7 +896,7 @@ For frequently used validators, cache validation results:
 
 ```python
 import functools
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
 class CachedValidator:
     """A wrapper that caches validation results."""
@@ -928,7 +928,7 @@ class CachedValidator:
         return self.validate(data_str)
 
 # Usage
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 # Create a schema
 user_schema = Object({
@@ -954,7 +954,7 @@ Cache validated data at the request level to avoid re-validation:
 ```python
 from functools import wraps
 from flask import g, request
-from sift.validators.base import ValidationError
+from voltar .validators.base import ValidationError
 
 def validate_once(schema):
     """Validate request data only once per request, even if called multiple times."""
@@ -995,8 +995,8 @@ For complex objects, validate fields in parallel:
 
 ```python
 import asyncio
-from sift import String, Number
-from sift.validators.base import ValidationError
+from voltar  import String, Number
+from voltar .validators.base import ValidationError
 
 async def validate_fields_parallel(data, field_validators):
     """Validate multiple fields in parallel."""
@@ -1063,8 +1063,8 @@ For non-critical validations, use background tasks:
 ```python
 from fastapi import FastAPI, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from sift import Object, String, List
-from sift.validators.base import ValidationError
+from voltar  import Object, String, List
+from voltar .validators.base import ValidationError
 
 app = FastAPI()
 
@@ -1126,7 +1126,7 @@ async def create_post(
 
 ## Conclusion and Best Practices
 
-When integrating Sift with web frameworks, follow these best practices for optimal results:
+When integrating Voltar  with web frameworks, follow these best practices for optimal results:
 
 ### Architecture Recommendations
 
@@ -1164,7 +1164,7 @@ When integrating Sift with web frameworks, follow these best practices for optim
    - Nexios: Leverage built-in validation decorators
 
 2. **Documentation Integration**:
-   - Generate OpenAPI schemas from your Sift validators
+   - Generate OpenAPI schemas from your Voltar  validators
    - Keep validation and documentation in sync automatically
 
 3. **Testing Strategy**:
@@ -1186,8 +1186,8 @@ When integrating Sift with web frameworks, follow these best practices for optim
 Implement graceful degradation where appropriate:
 
 ```python
-from sift import Object, String, List, Any
-from sift.validators.base import ValidationError
+from voltar  import Object, String, List, Any
+from voltar .validators.base import ValidationError
 
 def validate_with_fallback(data, schema, fallback_schema=None):
     """Try strict validation first, then fall back to a more permissive schema if needed."""
@@ -1234,7 +1234,7 @@ Define schemas once and reuse them to avoid overhead:
 
 ```python
 # schemas.py
-from sift import Object, String, Number, Boolean, List
+from voltar  import Object, String, Number, Boolean, List
 
 # Base schemas
 id_schema = Number().int().positive()
@@ -1274,7 +1274,7 @@ Create a central registry for validators to easily manage and update them:
 
 ```python
 # validators_registry.py
-from sift import Object, String, Number, Boolean, List
+from voltar  import Object, String, Number, Boolean, List
 
 class ValidatorRegistry:
     """Central registry for validators."""
@@ -1363,7 +1363,7 @@ class ValidationCache:
 validation_cache = ValidationCache()
 
 # Create a cached validator
-from sift.validators.base import Validator
+from voltar .validators.base import Validator
 
 class CachedGlobalValidator:
     """Wrapper for a validator that uses the global cache."""
@@ -1397,7 +1397,7 @@ Adjust validation depth based on system load:
 import os
 import psutil
 from enum import Enum
-from sift import Object, String, Number, List
+from voltar  import Object, String, Number, List
 
 class ValidationLevel(Enum):
     MINIMAL = 1   # Basic validation only
@@ -1521,7 +1521,7 @@ def validate_user(data):
 
 ## Conclusion
 
-Integrating Sift with web frameworks provides powerful validation capabilities that can be tailored to your specific application needs. By following the patterns and practices outlined in this guide, you can:
+Integrating Voltar  with web frameworks provides powerful validation capabilities that can be tailored to your specific application needs. By following the patterns and practices outlined in this guide, you can:
 
 1. **Ensure data integrity** through consistent validation across your application
 2. **Improve user experience** with clear, helpful error messages
@@ -1529,7 +1529,7 @@ Integrating Sift with web frameworks provides powerful validation capabilities t
 4. **Maintain clean code** by separating validation logic from business logic
 5. **Scale efficiently** with async validation and load-adaptive techniques
 
-Each web framework has its unique integration points, but Sift's flexible design allows it to work seamlessly with any of them, whether you're using FastAPI, Flask, Django, Nexios, or another framework.
+Each web framework has its unique integration points, but Voltar 's flexible design allows it to work seamlessly with any of them, whether you're using FastAPI, Flask, Django, Nexios, or another framework.
 
 Remember that validation is not just about rejecting bad data – it's about creating a robust, secure, and user-friendly application that guides users toward proper usage while maintaining data integrity.
 
@@ -1541,4 +1541,4 @@ As you implement validation in your application, consider the following key take
 - **Optimize intelligently**: Apply performance techniques where they make the most impact
 - **Provide clarity**: Make validation errors helpful for both users and developers
 
-By thoughtfully integrating Sift into your framework of choice, you can build applications that are both robust and user-friendly, with validation that enhances rather than hinders the user experience.
+By thoughtfully integrating Voltar  into your framework of choice, you can build applications that are both robust and user-friendly, with validation that enhances rather than hinders the user experience.

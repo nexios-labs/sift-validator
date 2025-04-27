@@ -1,18 +1,18 @@
 # OpenAPI Integration
 
-This guide explains how to use Sift to generate [OpenAPI](https://www.openapis.org/) (formerly known as Swagger) documentation for your APIs. OpenAPI provides a standardized way to describe RESTful APIs, enabling automated generation of documentation, client libraries, and testing tools.
+This guide explains how to use Voltar  to generate [OpenAPI](https://www.openapis.org/) (formerly known as Swagger) documentation for your APIs. OpenAPI provides a standardized way to describe RESTful APIs, enabling automated generation of documentation, client libraries, and testing tools.
 
 ## OpenAPI Schema Generation
 
 ### Basic Schema Generation
 
-Sift provides tools to automatically convert validators into OpenAPI schema definitions:
+Voltar  provides tools to automatically convert validators into OpenAPI schema definitions:
 
 ```python
-from sift import String, Number, Object, List, Boolean
-from sift.openapi import generate_openapi_schema
+from voltar  import String, Number, Object, List, Boolean
+from voltar .openapi import generate_openapi_schema
 
-# Define a Sift validator
+# Define a Voltar  validator
 user_schema = Object({
     "id": Number().int().positive(),
     "username": String().min(3).max(50),
@@ -88,9 +88,9 @@ This produces an OpenAPI-compatible JSON schema:
 
 ### Schema Mapping
 
-Sift has built-in mapping logic that translates validator constraints to equivalent OpenAPI properties:
+Voltar  has built-in mapping logic that translates validator constraints to equivalent OpenAPI properties:
 
-| Sift Validator  | OpenAPI Schema |
+| Voltar  Validator  | OpenAPI Schema |
 |-----------------|----------------|
 | `String()`      | `{"type": "string"}` |
 | `String().email()` | `{"type": "string", "format": "email"}` |
@@ -108,19 +108,19 @@ Sift has built-in mapping logic that translates validator constraints to equival
 
 ### FastAPI Integration
 
-FastAPI has built-in support for OpenAPI, and you can use Sift to generate the schemas:
+FastAPI has built-in support for OpenAPI, and you can use Voltar  to generate the schemas:
 
 ```python
 from fastapi import FastAPI, Depends, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from sift import Object, String, Number, Boolean, List as SiftList
-from sift.openapi import generate_openapi_schema
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number, Boolean, List as Voltar List
+from voltar .openapi import generate_openapi_schema
+from voltar .validators.base import ValidationError
 
 app = FastAPI()
 
-# Define Sift validator
+# Define Voltar  validator
 user_schema = Object({
     "username": String().min(3).max(50),
     "email": String().email(),
@@ -135,8 +135,8 @@ class UserModel(BaseModel):
     age: int
     is_admin: bool = False
 
-# Helper to validate with Sift
-async def validate_with_sift(request: Request, schema):
+# Helper to validate with Voltar 
+async def validate_with_voltar (request: Request, schema):
     try:
         data = await request.json()
         return await schema.validate_async(data)
@@ -144,9 +144,9 @@ async def validate_with_sift(request: Request, schema):
         error_details = [{"field": ".".join(err.path), "message": err.message} for err in e.errors]
         raise HTTPException(status_code=422, detail=error_details)
 
-# Endpoint with Sift validation
+# Endpoint with Voltar  validation
 @app.post("/users/", response_model=UserModel)
-async def create_user(user_data: Dict[str, Any] = Depends(lambda request: validate_with_sift(request, user_schema))):
+async def create_user(user_data: Dict[str, Any] = Depends(lambda request: validate_with_voltar (request, user_schema))):
     # Process validated user data
     return user_data
 ```
@@ -157,14 +157,14 @@ For Flask, you can use Flask-OpenAPI or manually add the schema to your Swagger 
 
 ```python
 from flask import Flask, request, jsonify
-from sift import Object, String, Number
-from sift.openapi import generate_openapi_schema
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number
+from voltar .openapi import generate_openapi_schema
+from voltar .validators.base import ValidationError
 import json
 
 app = Flask(__name__)
 
-# Define Sift validator
+# Define Voltar  validator
 user_schema = Object({
     "username": String().min(3).max(50),
     "email": String().email(),
@@ -216,7 +216,7 @@ openapi_spec = {
 def get_openapi_spec():
     return jsonify(openapi_spec)
 
-# API endpoint with Sift validation
+# API endpoint with Voltar  validation
 @app.route("/users", methods=["POST"])
 def create_user():
     try:
@@ -231,16 +231,16 @@ def create_user():
 
 ### Nexios Integration
 
-If you're using the Nexios framework, Sift validation is built-in and OpenAPI documentation is generated automatically:
+If you're using the Nexios framework, Voltar  validation is built-in and OpenAPI documentation is generated automatically:
 
 ```python
 from nexios import get_application
 from nexios.http import Request, Response
-from sift import Object, String, Number, Boolean
+from voltar  import Object, String, Number, Boolean
 
 app = get_application()
 
-# Define Sift validator
+# Define Voltar  validator
 user_schema = Object({
     "username": String().min(3).max(50),
     "email": String().email(),
@@ -251,7 +251,7 @@ user_schema = Object({
 @app.post("/users")
 async def create_user(request: Request, response: Response):
     try:
-        # Validate with Sift schema
+        # Validate with Voltar  schema
         data = await request.json()
         validated_data = await user_schema.validate_async(data)
         
@@ -260,7 +260,7 @@ async def create_user(request: Request, response: Response):
     except Exception as e:
         return response.json({"status": "error", "message": str(e)}, status=422)
 
-# Nexios automatically generates OpenAPI docs from Sift schemas
+# Nexios automatically generates OpenAPI docs from Voltar  schemas
 app.include_openapi_documentation()
 ```
 
@@ -271,8 +271,8 @@ app.include_openapi_documentation()
 You can add custom metadata to the generated schema:
 
 ```python
-from sift import Object, String, Number
-from sift.openapi import generate_openapi_schema
+from voltar  import Object, String, Number
+from voltar .openapi import generate_openapi_schema
 
 # Define a schema with custom metadata
 product_schema = Object({
@@ -309,11 +309,11 @@ schema = generate_openapi_schema(product_schema)
 
 ### Custom Schema Transformers
 
-You can customize how Sift validators are converted to OpenAPI schemas:
+You can customize how Voltar  validators are converted to OpenAPI schemas:
 
 ```python
-from sift import String, Object
-from sift.openapi import generate_openapi_schema, OpenAPISchemaTransformer
+from voltar  import String, Object
+from voltar .openapi import generate_openapi_schema, OpenAPISchemaTransformer
 from typing import Any, Dict
 
 # Define a custom transformer
@@ -366,8 +366,8 @@ schema = generate_openapi_schema(contact_schema, transformer=CustomTransformer()
 Sometimes you need to add OpenAPI-specific details that don't map directly to validators:
 
 ```python
-from sift import Object, String, Number, List
-from sift.openapi import generate_openapi_schema
+from voltar  import Object, String, Number, List
+from voltar .openapi import generate_openapi_schema
 
 # Define the validator
 user_schema = Object({
@@ -429,8 +429,8 @@ path_item = {
 A common pattern for list endpoints is pagination:
 
 ```python
-from sift import Object, String, Number, List, Any
-from sift.openapi import generate_openapi_schema
+from voltar  import Object, String, Number, List, Any
+from voltar .openapi import generate_openapi_schema
 
 # Define a generic item schema
 item_schema = Any()  # Replace with your actual item schema
@@ -468,8 +468,8 @@ openapi_schema = generate_openapi_schema(users_response_schema)
 For search or filter endpoints:
 
 ```python
-from sift import Object, String, Number, Boolean, List
-from sift.openapi import generate_openapi_schema
+from voltar  import Object, String, Number, Boolean, List
+from voltar .openapi import generate_openapi_schema
 
 # Define a search filter schema
 user_filter_schema = Object({
@@ -496,8 +496,8 @@ filter_schema = generate_openapi_schema(user_filter_schema)
 Define consistent error response schemas:
 
 ```python
-from sift import Object, String, Number, List
-from sift.openapi import generate_openapi_schema
+from voltar  import Object, String, Number, List
+from voltar .openapi import generate_openapi_schema
 
 # Define an error schema
 error_schema = Object({
@@ -565,8 +565,8 @@ api_spec = {
 Many APIs use a consistent wrapper for all responses:
 
 ```python
-from sift import Object, String, Any, Boolean
-from sift.openapi import generate_openapi_schema
+from voltar  import Object, String, Any, Boolean
+from voltar .openapi import generate_openapi_schema
 
 # Define a generic API response wrapper
 def api_response(data_schema):
@@ -791,12 +791,12 @@ The `sort` parameter is deprecated and will be removed in v3.0. Use
 
 ## Conclusion
 
-Sift's integration with OpenAPI makes it easy to generate accurate API documentation that stays in sync with your validation logic. By using Sift validators as the source of truth for both validation and documentation, you ensure consistency between your API behavior and its documentation.
+Voltar 's integration with OpenAPI makes it easy to generate accurate API documentation that stays in sync with your validation logic. By using Voltar  validators as the source of truth for both validation and documentation, you ensure consistency between your API behavior and its documentation.
 
-Key benefits of using Sift with OpenAPI include:
+Key benefits of using Voltar  with OpenAPI include:
 
 1. **Single Source of Truth**: Your validation logic and API documentation come from the same source
-2. **Type Safety**: Sift's strong typing ensures your documentation accurately reflects data types
+2. **Type Safety**: Voltar 's strong typing ensures your documentation accurately reflects data types
 3. **Automatic Updates**: Documentation automatically stays in sync when you change your validators
 4. **Consistency**: Unified approach to validation across your entire API
 
@@ -812,8 +812,8 @@ To further enhance your API documentation:
 
 4. **Add Examples**: Enhance your documentation with realistic examples for each endpoint
 
-5. **Implement Request/Response Validation**: Use Sift not only for documentation but also to validate actual API requests and responses
+5. **Implement Request/Response Validation**: Use Voltar  not only for documentation but also to validate actual API requests and responses
 
-By combining Sift's powerful validation capabilities with OpenAPI's standardized documentation format, you can create API documentation that's both accurate and user-friendly.
+By combining Voltar 's powerful validation capabilities with OpenAPI's standardized documentation format, you can create API documentation that's both accurate and user-friendly.
 
 For more information about framework-specific integration, see the [Framework Integration](../deployment/framework-integration.md) guide.

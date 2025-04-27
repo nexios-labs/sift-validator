@@ -1,5 +1,5 @@
 """
-Sift: A Python validation library with Zod-like syntax and async support.
+Voltar : A Python validation library with Zod-like syntax and async support.
 
 This module provides a chainable API for data validation with both
 synchronous and asynchronous support, comprehensive type hints,
@@ -9,10 +9,10 @@ and OpenAPI schema generation capabilities.
 __version__ = "0.1.0"
 
 # Import commonly used validators for convenient access
-from sift.validators.base import Validator
-from sift.validators.primitives import String, Number, Boolean, Any, Null
-from sift.validators.collections import List, Dict, Tuple,Union
-from sift.validators.objects import Object
+from voltar .validators.base import Validator
+from voltar .validators.primitives import String, Number, Boolean, Any, Null
+from voltar .validators.collections import List, Dict, Tuple,Union
+from voltar .validators.objects import Object
 
 
 __all__ = [

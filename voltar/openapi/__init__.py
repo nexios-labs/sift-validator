@@ -1,9 +1,9 @@
 """
-OpenAPI schema generation for Sift validators.
+OpenAPI schema generation for Voltar  validators.
 """
 
 # Direct import without renaming to avoid confusion
-from sift.openapi.schema import (
+from voltar .openapi.schema import (
     generate_schema,
     generate_full_openapi_schema,
     OpenAPIVersion,

@@ -1,6 +1,6 @@
-![Sift Logo](./assets/logo.png)
+![Voltar  Logo](./assets/logo.png)
 
-# Sift
+# Voltar 
 
 A modern Python validation library with Zod-like syntax, async support, and OpenAPI integration.
 
@@ -16,13 +16,13 @@ A modern Python validation library with Zod-like syntax, async support, and Open
 ## Installation
 
 ```bash
-pip install sift
+pip install voltar 
 ```
 
 ## Quick Start
 
 ```python
-from sift import String, Number, Object, List
+from voltar  import String, Number, Object, List
 
 # Define a schema
 user_schema = Object({
@@ -63,8 +63,8 @@ asyncio.run(validate_user_async())
 ## OpenAPI Integration
 
 ```python
-from sift import String, Number, Object
-from sift.openapi import generate_openapi_schema
+from voltar  import String, Number, Object
+from voltar .openapi import generate_openapi_schema
 
 user_schema = Object({
     "username": String().min(3).max(20),

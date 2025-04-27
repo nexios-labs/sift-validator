@@ -1,5 +1,5 @@
 """
-Async validation examples for the Sift library.
+Async validation examples for the Voltar  library.
 
 This example demonstrates:
 1. Basic async validation
@@ -18,11 +18,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Union
 
-# Add the parent directory to the Python path to import sift
+# Add the parent directory to the Python path to import voltar 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sift import String, Number, Boolean, Object, List, Dict
-from sift.validators.base import Validator, ValidationError
+from voltar  import String, Number, Boolean, Object, List, Dict
+from voltar .validators.base import Validator, ValidationError
 
 
 # Utility functions for simulating async operations

@@ -1,29 +1,29 @@
 """
-Utility for converting Sift schemas to Pydantic models.
+Utility for converting Voltar  schemas to Pydantic models.
 
-This module provides functionality to convert Sift validator schemas 
+This module provides functionality to convert Voltar  validator schemas 
 into equivalent Pydantic model classes with appropriate type hints
 and validation constraints.
 
 ## Overview
 
-The SIFT validator system provides a flexible way to validate data using
+The VOLTAR  validator system provides a flexible way to validate data using
 a chainable API. Pydantic is a popular data validation library in the Python
-ecosystem. This module bridges the gap between SIFT validators and Pydantic
+ecosystem. This module bridges the gap between VOLTAR  validators and Pydantic
 models, allowing you to:
 
-1. Define your data schemas using SIFT validators
+1. Define your data schemas using VOLTAR  validators
 2. Convert those schemas to Pydantic models for use with other Pydantic-compatible libraries
 3. Leverage both systems depending on your needs
 
 ## Basic Usage
 
 ```python
-from sift.validators.primitives import String, Number, Boolean
-from sift.validators.objects import Object
-from sift.pydantic_converter import convert_schema
+from voltar .validators.primitives import String, Number, Boolean
+from voltar .validators.objects import Object
+from voltar .pydantic_converter import convert_schema
 
-# Define a SIFT schema
+# Define a VOLTAR  schema
 user_schema = {
     "username": String().min(3).max(20),
     "age": Number().int().min(0),
@@ -51,7 +51,7 @@ The converter supports:
 
 ### Validator Type Mapping
 
-| SIFT Validator | Pydantic/Python Type |
+| VOLTAR  Validator | Pydantic/Python Type |
 |----------------|----------------------|
 | String         | str                  |
 | String().email() | EmailStr           |
@@ -75,17 +75,17 @@ import re
 # Import Pydantic
 from pydantic import BaseModel, Field, EmailStr, validator, constr, conint, confloat, create_model
 
-# Import Sift validators
-from sift.validators.base import Validator, ValidationError
-from sift.validators.primitives import String, Number, Boolean, Any as SiftAny, Null
-from sift.validators.collections import List, Dict as SiftDict, Tuple as SiftTuple, Union
-from sift.validators.objects import Object
+# Import Voltar  validators
+from voltar .validators.base import Validator, ValidationError
+from voltar .validators.primitives import String, Number, Boolean, Any as Voltar Any, Null
+from voltar .validators.collections import List, Dict as Voltar Dict, Tuple as Voltar Tuple, Union
+from voltar .validators.objects import Object
 
 class SchemaConverter:
     """
-    Converts Sift validator schemas to Pydantic models.
+    Converts Voltar  validator schemas to Pydantic models.
     
-    This class analyzes Sift validators and their chain modifiers to create
+    This class analyzes Voltar  validators and their chain modifiers to create
     equivalent Pydantic model classes with proper type hints and validation.
     
     The converter handles:
@@ -102,8 +102,8 @@ class SchemaConverter:
     
     Example:
         ```python
-        from sift.validators.primitives import String, Number
-        from sift.validators.objects import Object
+        from voltar .validators.primitives import String, Number
+        from voltar .validators.objects import Object
         
         # Create a converter instance
         converter = SchemaConverter()
@@ -127,10 +127,10 @@ class SchemaConverter:
         
     def convert_schema(self, schema: Dict[str, Validator], model_name: str = "GeneratedModel") -> Type[BaseModel]:
         """
-        Converts a Sift schema dictionary to a Pydantic model class.
+        Converts a Voltar  schema dictionary to a Pydantic model class.
         
         Args:
-            schema: Dictionary mapping field names to Sift validators
+            schema: Dictionary mapping field names to Voltar  validators
             model_name: Name for the generated Pydantic model class
             
         Returns:
@@ -148,10 +148,10 @@ class SchemaConverter:
     
     def convert_object(self, obj_validator: Object, class_name: str = "GeneratedModel") -> Type[BaseModel]:
         """
-        Converts a Sift Object validator to a Pydantic model class.
+        Converts a Voltar  Object validator to a Pydantic model class.
         
         Args:
-            obj_validator: Sift Object validator instance
+            obj_validator: Voltar  Object validator instance
             class_name: Name for the generated Pydantic model class
             
         Returns:
@@ -163,10 +163,10 @@ class SchemaConverter:
     
     def _convert_validator(self, validator: Validator, field_name: str = None) -> Tuple[Type, Any]:
         """
-        Converts a Sift validator to a Pydantic field type and constraints.
+        Converts a Voltar  validator to a Pydantic field type and constraints.
         
         Args:
-            validator: Sift validator instance
+            validator: Voltar  validator instance
             field_name: Optional name of the field (for error messages)
             
         Returns:
@@ -198,17 +198,17 @@ class SchemaConverter:
             return self._convert_boolean_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, List):
             return self._convert_list_validator(validator, field_params, is_optional, is_nullable)
-        elif isinstance(validator, SiftDict):
+        elif isinstance(validator, Voltar Dict):
             return self._convert_dict_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, Object):
             return self._convert_object_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, Union):
             return self._convert_union_validator(validator, field_params, is_optional, is_nullable)
-        elif isinstance(validator, SiftAny):
+        elif isinstance(validator, Voltar Any):
             return self._convert_any_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, Null):
             return self._convert_null_validator(validator, field_params)
-        elif isinstance(validator, SiftTuple):
+        elif isinstance(validator, Voltar Tuple):
             return self._convert_tuple_validator(validator, field_params, is_optional, is_nullable)
         else:
             # Default to Any for unknown validators
@@ -378,7 +378,7 @@ class SchemaConverter:
             
         return py_type, Field(**field_params) if field_params else None
     
-    def _convert_any_validator(self, validator: SiftAny, field_params: Dict[str, Any],
+    def _convert_any_validator(self, validator: Voltar Any, field_params: Dict[str, Any],
                            is_optional: bool, is_nullable: bool) -> Tuple[Type, Any]:
         """Convert Any validator to Pydantic field."""
         py_type = Any
@@ -394,7 +394,7 @@ class SchemaConverter:
         py_type = Optional[Any]
         return py_type, Field(default=None, **field_params)
     
-    def _convert_tuple_validator(self, validator: SiftTuple, field_params: Dict[str, Any],
+    def _convert_tuple_validator(self, validator: Voltar Tuple, field_params: Dict[str, Any],
                              is_optional: bool, is_nullable: bool) -> Tuple[Type, Any]:
         """Convert Tuple validator to Pydantic field."""
         # Get the tuple item validators
@@ -419,16 +419,16 @@ class SchemaConverter:
 
 
 
-# Example demonstrating complete conversion from SIFT to Pydantic
+# Example demonstrating complete conversion from VOLTAR  to Pydantic
 """
-The following example demonstrates a more complex conversion from SIFT validators
+The following example demonstrates a more complex conversion from VOLTAR  validators
 to Pydantic models, including nested objects, lists, and various constraints.
 
 ```python
-from sift.validators.primitives import String, Number, Boolean
-from sift.validators.collections import List, Dict
-from sift.validators.objects import Object
-from sift.pydantic_converter import convert_schema
+from voltar .validators.primitives import String, Number, Boolean
+from voltar .validators.collections import List, Dict
+from voltar .validators.objects import Object
+from voltar .pydantic_converter import convert_schema
 
 # Define a nested address schema
 address_schema = {
@@ -487,13 +487,13 @@ The converter handles:
 
 def convert_object(obj_validator: Object, model_name: str = "GeneratedModel") -> Type[BaseModel]:
     """
-    Convert a Sift Object validator to a Pydantic model class.
+    Convert a Voltar  Object validator to a Pydantic model class.
     
-    This function takes a SIFT Object validator instance and creates an equivalent
+    This function takes a VOLTAR  Object validator instance and creates an equivalent
     Pydantic model class with all fields and validations properly mapped.
     
     Args:
-        obj_validator: SIFT Object validator instance containing a schema
+        obj_validator: VOLTAR  Object validator instance containing a schema
         model_name: Name for the generated Pydantic model class
     
     Returns:
@@ -502,9 +502,9 @@ def convert_object(obj_validator: Object, model_name: str = "GeneratedModel") ->
     
     Example:
         ```python
-        from sift.validators.primitives import String, Number
-        from sift.validators.objects import Object
-        from sift.pydantic_converter import convert_object
+        from voltar .validators.primitives import String, Number
+        from voltar .validators.objects import Object
+        from voltar .pydantic_converter import convert_object
         
         # Create an Object validator
         user_validator = Object({
@@ -524,14 +524,14 @@ def convert_object(obj_validator: Object, model_name: str = "GeneratedModel") ->
 
 def convert_schema(schema: Dict[str, Validator], model_name: str = "GeneratedModel") -> Type[BaseModel]:
     """
-    Convert a Sift schema dictionary to a Pydantic model class.
+    Convert a Voltar  schema dictionary to a Pydantic model class.
     
-    This function is the main entry point for converting SIFT validator schemas
+    This function is the main entry point for converting VOLTAR  validator schemas
     directly to Pydantic models. It handles all validator types, nested structures,
     and validation constraints.
     
     Args:
-        schema: Dictionary mapping field names to Sift validators
+        schema: Dictionary mapping field names to Voltar  validators
         model_name: Name for the generated Pydantic model class
     
     Returns:
@@ -540,8 +540,8 @@ def convert_schema(schema: Dict[str, Validator], model_name: str = "GeneratedMod
     
     Example:
         ```python
-        from sift.validators.primitives import String, Number, Boolean
-        from sift.pydantic_converter import convert_schema
+        from voltar .validators.primitives import String, Number, Boolean
+        from voltar .pydantic_converter import convert_schema
         
         # Define a schema dictionary
         schema = {
@@ -571,24 +571,24 @@ def convert_schema(schema: Dict[str, Validator], model_name: str = "GeneratedMod
     converter = SchemaConverter()
     return converter.convert_schema(schema, model_name)
 
-# Additional documentation on SIFT to Pydantic type conversion
+# Additional documentation on VOLTAR  to Pydantic type conversion
 """
 ## Detailed Conversion Reference
 
 ### Basic Types
 
-SIFT String validators convert to Python's `str` type with appropriate constraints:
+VOLTAR  String validators convert to Python's `str` type with appropriate constraints:
 ```python
-# SIFT
+# VOLTAR 
 name = String().min(2).max(50)
 
 # Pydantic equivalent
 name: str = Field(..., min_length=2, max_length=50)
 ```
 
-SIFT Number validators map to either `int` or `float` based on configuration:
+VOLTAR  Number validators map to either `int` or `float` based on configuration:
 ```python
-# SIFT
+# VOLTAR 
 count = Number().int().min(0)
 amount = Number().min(0.01).max(1000)
 
@@ -597,9 +597,9 @@ count: int = Field(..., ge=0)
 amount: float = Field(..., ge=0.01, le=1000)
 ```
 
-SIFT Boolean validators map directly to Python's `bool`:
+VOLTAR  Boolean validators map directly to Python's `bool`:
 ```python
-# SIFT
+# VOLTAR 
 is_active = Boolean().default(True)
 
 # Pydantic equivalent
@@ -610,7 +610,7 @@ is_active: bool = Field(True)
 
 Both optional and nullable use Python's `Optional` type:
 ```python
-# SIFT
+# VOLTAR 
 optional_field = String().optional()
 nullable_field = String().nullable()
 
@@ -623,7 +623,7 @@ nullable_field: Optional[str] = Field(...)
 
 Lists with item validation:
 ```python
-# SIFT
+# VOLTAR 
 tags = List(String())
 
 # Pydantic equivalent
@@ -632,7 +632,7 @@ tags: List[str] = Field(...)
 
 Dictionaries map to either Dict[str, Any] or nested models:
 ```python
-# SIFT
+# VOLTAR 
 metadata = Dict()  # Untyped dictionary
 
 # Pydantic equivalent
@@ -643,7 +643,7 @@ metadata: Dict[str, Any] = Field(...)
 
 Object validators create nested Pydantic models:
 ```python
-# SIFT
+# VOLTAR 
 address = Object({
     "street": String(),
     "city": String(),
@@ -664,7 +664,7 @@ address: AddressModel = Field(...)
 
 Union validators create Python Union types:
 ```python
-# SIFT
+# VOLTAR 
 id_field = Union([String(), Number().int()])
 
 # Pydantic equivalent

@@ -1,15 +1,15 @@
 # Advanced Validation
 
-This guide covers advanced validation techniques in Sift, enabling you to handle complex validation scenarios and extend the library with custom functionality.
+This guide covers advanced validation techniques in Voltar , enabling you to handle complex validation scenarios and extend the library with custom functionality.
 
 ## Custom Validators
 
 ### Creating Custom Validators
 
-You can extend Sift by creating custom validators that implement your specific validation logic:
+You can extend Voltar  by creating custom validators that implement your specific validation logic:
 
 ```python
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, List
 
 class EvenNumberValidator(Validator[int, int]):
@@ -40,11 +40,11 @@ even_validator.validate(3)  # ValidationError: Number must be even
 
 ### Extending Built-in Validators
 
-You can also extend Sift's built-in validators to add custom functionality:
+You can also extend Voltar 's built-in validators to add custom functionality:
 
 ```python
-from sift import String
-from sift.validators.base import ValidationError
+from voltar  import String
+from voltar .validators.base import ValidationError
 from typing import Any, List, Optional
 
 class PasswordValidator(String):
@@ -94,7 +94,7 @@ password_validator.validate("Short1")         # ValidationError: Password must b
 You can add custom chainable methods to your validators:
 
 ```python
-from sift.validators.base import Validator
+from voltar .validators.base import Validator
 from typing import Any, List, TypeVar, Generic, Callable, cast, Optional
 
 T = TypeVar('T')
@@ -122,7 +122,7 @@ class CustomValidator(Validator[T, R], Generic[T, R]):
         return validator
 
 # Example usage with a String validator
-from sift import String
+from voltar  import String
 
 class EnhancedString(String):
     def reverse(self) -> 'EnhancedString':
@@ -153,10 +153,10 @@ result = enhanced.validate("hello")  # Returns: "olleh"
 
 ### Deep Nested Objects
 
-Sift excels at validating deeply nested data structures:
+Voltar  excels at validating deeply nested data structures:
 
 ```python
-from sift import Object, String, Number, List, Boolean
+from voltar  import Object, String, Number, List, Boolean
 
 # Define a complex nested schema
 company_schema = Object({
@@ -243,7 +243,7 @@ validated_company = company_schema.validate(company_data)
 For complex schemas, it's often beneficial to break down the schema into reusable components:
 
 ```python
-from sift import Object, String, Number, List
+from voltar  import Object, String, Number, List
 
 # Reusable components
 address_schema = Object({
@@ -288,8 +288,8 @@ team_schema = Object({
 You can implement conditional validation where the validation of one field depends on another:
 
 ```python
-from sift import Object, String, Number, Boolean
-from sift.validators.base import Validator, ValidationError
+from voltar  import Object, String, Number, Boolean
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, Dict, List
 
 class ConditionalObject(Object):
@@ -378,8 +378,8 @@ invalid_bank_transfer = {
 You can also create schemas that adapt dynamically based on the data:
 
 ```python
-from sift import Object, String, Number, List, Union, Any as AnyValidator
-from sift.validators.base import Validator, ValidationError
+from voltar  import Object, String, Number, List, Union, Any as AnyValidator
+from voltar .validators.base import Validator, ValidationError
 from typing import Dict, Any, List as ListType
 
 class DynamicValidator(Validator):
@@ -457,7 +457,7 @@ dynamic_schema.validate(product_data)  # OK
 Use `Union` to validate data against multiple possible schemas:
 
 ```python
-from sift import Union, Number, String, Boolean
+from voltar  import Union, Number, String, Boolean
 
 # Create a union validator that accepts different types
 multi_type = Union([String(), Number(), Boolean()])
@@ -473,7 +473,7 @@ multi_type.validate([])       # ValidationError: Value did not match any of the 
 For more complex scenarios, you can use discriminated unions to select the appropriate schema based on a "discriminator" field:
 
 ```python
-from sift import Union, Object, String, Number, List
+from voltar  import Union, Object, String, Number, List
 
 # Define schemas for different shapes
 circle_schema = Object({

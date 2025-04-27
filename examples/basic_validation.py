@@ -1,5 +1,5 @@
 """
-Basic validation examples for the Sift library.
+Basic validation examples for the Voltar  library.
 
 This example demonstrates:
 1. Simple string/number/boolean validation
@@ -15,12 +15,12 @@ This example demonstrates:
 import sys
 from pathlib import Path
 
-# Add the parent directory to the Python path to import sift
+# Add the parent directory to the Python path to import voltar 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sift import String, Number, Boolean, Object, List, Dict, Union
-from sift.validators.collections import Tuple
-from sift.validators.base import ValidationError
+from voltar  import String, Number, Boolean, Object, List, Dict, Union
+from voltar .validators.collections import Tuple
+from voltar .validators.base import ValidationError
 
 
 def demonstrate_string_validation():

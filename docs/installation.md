@@ -1,10 +1,10 @@
 # Installation
 
-This guide covers the different ways to install Sift in your Python environment.
+This guide covers the different ways to install Voltar  in your Python environment.
 
 ## Requirements
 
-Sift is designed to work with modern Python versions:
+Voltar  is designed to work with modern Python versions:
 
 - Python 3.8 or higher
 - No external dependencies for core functionality
@@ -13,16 +13,16 @@ Sift is designed to work with modern Python versions:
 
 ### Using pip (Recommended)
 
-The simplest way to install Sift is using pip:
+The simplest way to install Voltar  is using pip:
 
 ```bash
-pip install sift-validator
+pip install voltar -validator
 ```
 
 To install the latest development version directly from GitHub:
 
 ```bash
-pip install git+https://github.com/nexios/sift.git
+pip install git+https://github.com/nexios/voltar .git
 ```
 
 ### Using Poetry
@@ -30,7 +30,7 @@ pip install git+https://github.com/nexios/sift.git
 If you're using Poetry for dependency management:
 
 ```bash
-poetry add sift-validator
+poetry add voltar -validator
 ```
 
 ### Using pipenv
@@ -38,19 +38,19 @@ poetry add sift-validator
 For Pipenv users:
 
 ```bash
-pipenv install sift-validator
+pipenv install voltar -validator
 ```
 
 ## Optional Dependencies
 
-Sift's core validation functionality has zero dependencies, but you can install optional packages for enhanced features:
+Voltar 's core validation functionality has zero dependencies, but you can install optional packages for enhanced features:
 
 ### OpenAPI Support
 
 For OpenAPI schema generation support:
 
 ```bash
-pip install sift-validator[openapi]
+pip install voltar -validator[openapi]
 ```
 
 ### Async Validation Performance
@@ -58,7 +58,7 @@ pip install sift-validator[openapi]
 For enhanced async validation performance:
 
 ```bash
-pip install sift-validator[async]
+pip install voltar -validator[async]
 ```
 
 ### Web Framework Integration
@@ -66,7 +66,7 @@ pip install sift-validator[async]
 For integration with web frameworks:
 
 ```bash
-pip install sift-validator[web]
+pip install voltar -validator[web]
 ```
 
 ### Install All Extensions
@@ -74,17 +74,17 @@ pip install sift-validator[web]
 To install all optional dependencies:
 
 ```bash
-pip install sift-validator[all]
+pip install voltar -validator[all]
 ```
 
 ## Development Installation
 
-If you want to contribute to Sift or install with development tools:
+If you want to contribute to Voltar  or install with development tools:
 
 ```bash
 # Clone the repository
-git clone https://github.com/nexios/sift.git
-cd sift
+git clone https://github.com/nexios/voltar .git
+cd voltar 
 
 # Install in development mode with dev dependencies
 pip install -e ".[dev]"
@@ -92,18 +92,18 @@ pip install -e ".[dev]"
 
 ## Verifying Installation
 
-After installation, you can verify that Sift is working correctly by running:
+After installation, you can verify that Voltar  is working correctly by running:
 
 ```python
-from sift import String
+from voltar  import String
 
 # This should work without errors
 validator = String()
-result = validator.validate("Hello, Sift!")
-print(result)  # Should print: Hello, Sift!
+result = validator.validate("Hello, Voltar !")
+print(result)  # Should print: Hello, Voltar !
 ```
 
 ## Next Steps
 
-Now that you have Sift installed, proceed to the [Quickstart](quickstart.md) guide to learn the basics of using Sift for data validation.
+Now that you have Voltar  installed, proceed to the [Quickstart](quickstart.md) guide to learn the basics of using Voltar  for data validation.
 

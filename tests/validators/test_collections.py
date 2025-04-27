@@ -6,12 +6,12 @@ import pytest
 import asyncio
 from typing import Any, Dict, List, Union as TypeUnion
 
-from sift.validators.base import Validator, ValidationError
-from sift.validators.primitives import String, Number, Boolean, Any, Null
-from sift.validators.collections import List as ListValidator
-from sift.validators.collections import Dict as DictValidator
-from sift.validators.collections import Tuple as TupleValidator
-from sift.validators.collections import Union
+from voltar .validators.base import Validator, ValidationError
+from voltar .validators.primitives import String, Number, Boolean, Any, Null
+from voltar .validators.collections import List as ListValidator
+from voltar .validators.collections import Dict as DictValidator
+from voltar .validators.collections import Tuple as TupleValidator
+from voltar .validators.collections import Union
 
 
 class TestListValidator:

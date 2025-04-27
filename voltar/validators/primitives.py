@@ -11,8 +11,8 @@ from typing import Any, Callable, Generic, List, Optional, Pattern, TypeVar, Uni
 from datetime import date, datetime
 import urllib.parse
 
-from sift.validators.email_validator import EmailValidator, EmailValidationError
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.email_validator import EmailValidator, EmailValidationError
+from voltar .validators.base import Validator, ValidationError
 
 T = TypeVar("T")
 

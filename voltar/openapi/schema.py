@@ -1,7 +1,7 @@
 """
 OpenAPI schema generation module.
 
-This module provides functionality to convert Sift validators to
+This module provides functionality to convert Voltar  validators to
 OpenAPI schema definitions for API documentation and client generation.
 """
 
@@ -9,10 +9,10 @@ from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union, cast
 import re
 from enum import Enum
 
-from sift.validators.base import Validator
-from sift.validators.primitives import String, Number, Boolean, Null, Any as AnyValidator
-from sift.validators.collections import List as ListValidator, Dict as DictValidator
-from sift.validators.collections import Tuple as TupleValidator, Union as UnionValidator
+from voltar .validators.base import Validator
+from voltar .validators.primitives import String, Number, Boolean, Null, Any as AnyValidator
+from voltar .validators.collections import List as ListValidator, Dict as DictValidator
+from voltar .validators.collections import Tuple as TupleValidator, Union as UnionValidator
 
 
 class OpenAPIVersion(Enum):

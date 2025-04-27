@@ -1,7 +1,7 @@
 """
-OpenAPI schema generator for Sift validators.
+OpenAPI schema generator for Voltar  validators.
 
-This module provides functionality to convert Sift validation schemas into
+This module provides functionality to convert Voltar  validation schemas into
 OpenAPI compatible schema definitions.
 """
 
@@ -9,14 +9,14 @@ from typing import Any, Dict, List, Optional, Set, Type, Union, cast
 import re
 from types import SimpleNamespace
 
-from sift.validators.base import Validator
-from sift.validators.primitives import String, Number, Boolean, Null, Any as AnyValidator
-from sift.validators.collections import List as ListValidator, Dict as DictValidator
-from sift.validators.collections import Tuple as TupleValidator, Union as UnionValidator
+from voltar .validators.base import Validator
+from voltar .validators.primitives import String, Number, Boolean, Null, Any as AnyValidator
+from voltar .validators.collections import List as ListValidator, Dict as DictValidator
+from voltar .validators.collections import Tuple as TupleValidator, Union as UnionValidator
 
 class OpenAPISchemaGenerator:
     """
-    Generator for converting Sift validators to OpenAPI schemas.
+    Generator for converting Voltar  validators to OpenAPI schemas.
     
     Attributes:
         referenced_schemas: A dictionary of schemas that have been referenced
@@ -110,7 +110,7 @@ class OpenAPISchemaGenerator:
             # Try to get its schema
             try:
                 # Import here to avoid circular import issues
-                from sift.validators.objects import Object
+                from voltar .validators.objects import Object
                 
                 # Check if it's an Object validator instance
                 if isinstance(validator, Object):

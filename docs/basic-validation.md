@@ -1,10 +1,10 @@
 # Basic Validation
 
-This guide covers the core validators available in Sift and how to use them effectively for basic validation scenarios.
+This guide covers the core validators available in Voltar  and how to use them effectively for basic validation scenarios.
 
 ## Primitive Validators
 
-Sift provides a set of primitive validators for handling common data types. These serve as the building blocks for more complex validation schemas.
+Voltar  provides a set of primitive validators for handling common data types. These serve as the building blocks for more complex validation schemas.
 
 ### String Validator
 
@@ -13,8 +13,8 @@ The `String` validator is used to validate and transform string values.
 #### Basic Usage
 
 ```python
-from sift import String
-from sift.validators.base import ValidationError
+from voltar  import String
+from voltar .validators.base import ValidationError
 
 # Basic string validation
 string_validator = String()
@@ -85,7 +85,7 @@ datetime.validate("not-a-date")            # ValidationError: Invalid ISO dateti
 
 #### String Transformations
 
-Sift can transform strings during validation:
+Voltar  can transform strings during validation:
 
 ```python
 # Trimming whitespace
@@ -111,7 +111,7 @@ The `Number` validator handles numeric values (integers and floats).
 #### Basic Usage
 
 ```python
-from sift import Number
+from voltar  import Number
 
 # Basic number validation
 number = Number()
@@ -197,7 +197,7 @@ The `Boolean` validator handles boolean values.
 #### Basic Usage
 
 ```python
-from sift import Boolean
+from voltar  import Boolean
 
 # Basic boolean validation
 boolean = Boolean()
@@ -238,7 +238,7 @@ truthy.validate("off")    # Returns: False
 The `Any` validator accepts any value type:
 
 ```python
-from sift import Any
+from voltar  import Any
 
 any_validator = Any()
 any_validator.validate(42)        # OK
@@ -253,7 +253,7 @@ any_validator.validate([1, 2, 3]) # OK
 The `Null` validator only accepts `None` values:
 
 ```python
-from sift import Null
+from voltar  import Null
 
 null_validator = Null()
 null_validator.validate(None)  # OK
@@ -264,10 +264,10 @@ null_validator.validate(42)    # ValidationError: Expected None, got int
 
 ### Optional and Nullable Fields
 
-Sift makes a clear distinction between optional values (can be omitted) and nullable values (can be `None`):
+Voltar  makes a clear distinction between optional values (can be omitted) and nullable values (can be `None`):
 
 ```python
-from sift import String, Object
+from voltar  import String, Object
 
 # Optional fields (can be omitted)
 schema = Object({
@@ -303,7 +303,7 @@ schema.validate({"required": "value", "optional_nullable": None})  # OK - field 
 You can specify default values for optional fields:
 
 ```python
-from sift import String, Boolean, Number, Object
+from voltar  import String, Boolean, Number, Object
 
 schema = Object({
     "username": String(),
@@ -318,12 +318,12 @@ print(result)  # {"username": "johndoe", "is_active": True, "score": 100}
 
 ## Type Coercion and Transformation
 
-Sift can transform data during validation:
+Voltar  can transform data during validation:
 
 ### String Transformations
 
 ```python
-from sift import String
+from voltar  import String
 
 # Multiple transformations in sequence
 formatted = String().trim().lowercase()
@@ -333,7 +333,7 @@ formatted.validate("  HELLO WORLD  ")  # Returns: "hello world"
 ### Number Coercion
 
 ```python
-from sift import Number, Object
+from voltar  import Number, Object
 
 # Converting string to number (when used with .truthy())
 schema = Object({
@@ -354,7 +354,7 @@ print(validated)  # {"id": 123, "amount": 99.99, "quantity": 1}
 ### Boolean Coercion
 
 ```python
-from sift import Boolean
+from voltar  import Boolean
 
 # Convert various inputs to boolean
 truthy = Boolean().truthy()
@@ -371,7 +371,7 @@ truthy.validate(0)         # Returns: False
 You can chain multiple validation rules together:
 
 ```python
-from sift import String, Number
+from voltar  import String, Number
 
 # Combining multiple constraints
 username = String().min(3).max(20).pattern(r"^[a-zA-Z0-9_]+$")
@@ -391,7 +391,7 @@ age.validate(150) # ValidationError: Value must be at most 120
 You can provide custom error messages for any validator:
 
 ```python
-from sift import String, Number, Object
+from voltar  import String, Number, Object
 
 # Custom error messages for individual validators
 username = String().min(3).error("Username is too short, minimum 3 characters")
@@ -410,8 +410,8 @@ user_schema = Object({
 ### Simple Error Handling
 
 ```python
-from sift import String
-from sift.validators.base import ValidationError
+from voltar  import String
+from voltar .validators.base import ValidationError
 
 validator = String().email()
 
@@ -424,11 +424,11 @@ except ValidationError as e:
 
 ### Multiple Validation Errors
 
-When validating complex objects, Sift collects all validation errors:
+When validating complex objects, Voltar  collects all validation errors:
 
 ```python
-from sift import Object, String, Number
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number
+from voltar .validators.base import ValidationError
 
 user_schema = Object({
     "username": String().min(3),
@@ -467,8 +467,8 @@ Validation failed with 3 errors:
 Errors include path information to identify where in a nested structure they occurred:
 
 ```python
-from sift import Object, String, List
-from sift.validators.base import ValidationError
+from voltar  import Object, String, List
+from voltar .validators.base import ValidationError
 
 schema = Object({
     "user": Object({
@@ -511,8 +511,8 @@ Error at user.contacts.1.value: Invalid email address format
 You might want to handle validation errors differently based on context:
 
 ```python
-from sift import Object, String
-from sift.validators.base import ValidationError
+from voltar  import Object, String
+from voltar .validators.base import ValidationError
 
 # Define a schema
 login_schema = Object({

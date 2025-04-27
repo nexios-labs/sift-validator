@@ -1,22 +1,22 @@
 # Integration Guide
 
-This guide covers how to integrate Sift into your applications, focusing on web frameworks and deployment considerations.
+This guide covers how to integrate Voltar  into your applications, focusing on web frameworks and deployment considerations.
 
 ## Integration with Web Frameworks
 
-Sift is designed to work seamlessly with all popular Python web frameworks. Here are integration examples for the most common ones.
+Voltar  is designed to work seamlessly with all popular Python web frameworks. Here are integration examples for the most common ones.
 
 ### FastAPI
 
-FastAPI has excellent support for validation libraries, and Sift integrates particularly well with it:
+FastAPI has excellent support for validation libraries, and Voltar  integrates particularly well with it:
 
 ```python
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
 from typing import Dict, Any
 
-from sift import Object, String, Number, Boolean, List
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number, Boolean, List
+from voltar .validators.base import ValidationError
 
 app = FastAPI()
 
@@ -29,13 +29,13 @@ user_schema = Object({
     "tags": List(String()).optional()
 })
 
-# Helper function to validate request data with Sift
+# Helper function to validate request data with Voltar 
 async def validate_user_data(request: Request):
     try:
         # Get JSON data from request
         json_data = await request.json()
         
-        # Validate with Sift
+        # Validate with Voltar 
         validated_data = await user_schema.validate_async(json_data)
         return validated_data
     except ValidationError as e:
@@ -46,14 +46,14 @@ async def validate_user_data(request: Request):
         # Handle other errors like invalid JSON
         raise HTTPException(status_code=400, detail={"error": "Invalid request data"})
 
-# Endpoint that uses Sift validation
+# Endpoint that uses Voltar  validation
 @app.post("/users/")
 async def create_user(user_data: Dict[str, Any] = Depends(validate_user_data)):
     # At this point, user_data is already validated
     # Proceed with business logic (e.g., save to database)
     return {"status": "success", "data": user_data}
 
-# Global exception handler for Sift validation errors
+# Global exception handler for Voltar  validation errors
 @app.exception_handler(ValidationError)
 async def validation_exception_handler(request: Request, exc: ValidationError):
     error_details = [{"field": ".".join(err.path), "message": err.message} for err in exc.errors]
@@ -65,12 +65,12 @@ async def validation_exception_handler(request: Request, exc: ValidationError):
 
 ### Flask
 
-For Flask applications, you can integrate Sift at various levels:
+For Flask applications, you can integrate Voltar  at various levels:
 
 ```python
 from flask import Flask, request, jsonify
-from sift import Object, String, Number
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number
+from voltar .validators.base import ValidationError
 
 app = Flask(__name__)
 
@@ -90,7 +90,7 @@ def create_user():
         if data is None:
             return jsonify({"error": "Invalid JSON"}), 400
             
-        # Validate with Sift
+        # Validate with Voltar 
         validated_data = user_schema.validate(data)
         
         # Process the validated data
@@ -136,7 +136,7 @@ def create_product(validated_data):
 
 ### Django
 
-Integrating Sift with Django, especially for REST APIs:
+Integrating Voltar  with Django, especially for REST APIs:
 
 ```python
 # views.py
@@ -145,8 +145,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 
-from sift import Object, String, Number, Boolean
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number, Boolean
+from voltar .validators.base import ValidationError
 
 # Define your validation schema
 user_schema = Object({
@@ -167,7 +167,7 @@ def create_user(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
             
-        # Validate with Sift
+        # Validate with Voltar 
         validated_data = user_schema.validate(data)
         
         # Process the validated data
@@ -189,7 +189,7 @@ from rest_framework.response import Response
 @api_view(['POST'])
 def create_user_drf(request):
     try:
-        # Validate with Sift
+        # Validate with Voltar 
         validated_data = user_schema.validate(request.data)
         
         # Process the validated data
@@ -212,8 +212,8 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route
 import json
 
-from sift import Object, String, Number
-from sift.validators.base import ValidationError
+from voltar  import Object, String, Number
+from voltar .validators.base import ValidationError
 
 # Define your validation schema
 user_schema = Object({
@@ -227,7 +227,7 @@ async def create_user(request):
         # Parse JSON data
         data = await request.json()
         
-        # Validate with Sift
+        # Validate with Voltar 
         validated_data = await user_schema.validate_async(data)
         
         # Process the validated data
@@ -255,12 +255,12 @@ app = Starlette(routes=routes)
 
 ### Nexios
 
-Nexios, developed by the same team as Sift, has first-class support for Sift validators:
+Nexios, developed by the same team as Voltar , has first-class support for Voltar  validators:
 
 ```python
 from nexios import get_application
 from nexios.http import Request, Response
-from sift import Object, String, Number, Boolean
+from voltar  import Object, String, Number, Boolean
 
 app = get_application()
 
@@ -278,7 +278,7 @@ async def create_user(request: Request, response: Response):
         # Get JSON data
         data = await request.json
         
-        # Validate with Sift
+        # Validate with Voltar 
         validated_data = await user_schema.validate_async(data)
         
         # Process the validated data
@@ -297,7 +297,7 @@ Structure your validation schemas separately from your route handlers:
 
 ```python
 # schemas.py
-from sift import Object, String, Number, Boolean, List
+from voltar  import Object, String, Number, Boolean, List
 
 # User-related schemas
 user_schema = Object({
@@ -333,7 +333,7 @@ Implement a consistent approach to handling validation errors:
 
 ```python
 # utils.py
-from sift.validators.base import ValidationError
+from voltar .validators.base import ValidationError
 
 def format_validation_error(error: ValidationError):
     """Format a validation error into a standardized response format."""
@@ -367,7 +367,7 @@ Adjust validation rules based on the environment:
 
 ```python
 import os
-from sift import Object, String, List
+from voltar  import Object, String, List
 
 # Default strict validation for production
 user_schema = Object({
@@ -392,7 +392,7 @@ if os.environ.get("ENVIRONMENT") in ("development", "testing"):
 For non-critical validations, consider using default values instead of rejecting the request:
 
 ```python
-from sift import Object, String, Number, List
+from voltar  import Object, String, Number, List
 
 # Instead of strict validation that might fail
 product_schema = Object({
@@ -416,7 +416,7 @@ forgiving_schema = Object({
 Implement different levels of validation based on the use case:
 
 ```python
-from sift import Object, String, Number
+from voltar  import Object, String, Number
 
 # Basic fast validation for list endpoints
 user_list_schema = Object({
@@ -444,7 +444,7 @@ user_search_schema = Object({
 Pass additional context to validators when needed:
 
 ```python
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 from typing import Any, Dict, List
 
 class ContextualValidator(Validator):
@@ -463,7 +463,7 @@ class ContextualValidator(Validator):
         return data
 
 # Usage
-from sift import Object, String
+from voltar  import Object, String
 
 user_schema = Object({
     "username": String().min(3),

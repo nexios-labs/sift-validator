@@ -1,5 +1,5 @@
 """
-Pytest configuration and fixtures for testing the Sift library.
+Pytest configuration and fixtures for testing the Voltar  library.
 """
 
 import sys
@@ -8,12 +8,12 @@ import pytest
 import asyncio
 from pathlib import Path
 
-# Add the parent directory to the Python path to import sift
+# Add the parent directory to the Python path to import voltar 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sift import String, Number, Boolean, Object, List, Dict, Union, Any, Null
-from sift.validators.base import Validator, ValidationError
-from sift.validators.collections import Tuple
+from voltar  import String, Number, Boolean, Object, List, Dict, Union, Any, Null
+from voltar .validators.base import Validator, ValidationError
+from voltar .validators.collections import Tuple
 
 
 #

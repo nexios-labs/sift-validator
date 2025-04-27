@@ -4,7 +4,7 @@ Self-contained email validator with RFC-compliant validation.
 
 import re
 from typing import Any, Optional
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
 
 class EmailNotValidError(ValidationError):

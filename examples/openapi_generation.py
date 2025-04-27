@@ -1,7 +1,7 @@
 """
-OpenAPI schema generation examples for the Sift library.
+OpenAPI schema generation examples for the Voltar  library.
 
-This example demonstrates how to generate OpenAPI schemas from Sift validators:
+This example demonstrates how to generate OpenAPI schemas from Voltar  validators:
 1. Basic schema generation
 2. Complex schema examples
 3. Custom validator schema generation
@@ -12,12 +12,12 @@ import sys
 import json
 from pathlib import Path
 
-# Add the parent directory to the Python path to import sift
+# Add the parent directory to the Python path to import voltar 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sift import String, Number, Boolean, Object, List, Dict, Union
-from sift.validators.collections import Tuple
-from sift.openapi.schema import (
+from voltar  import String, Number, Boolean, Object, List, Dict, Union
+from voltar .validators.collections import Tuple
+from voltar .openapi.schema import (
     generate_schema, 
     generate_full_openapi_schema,
     OpenAPIVersion,
@@ -317,7 +317,7 @@ def demonstrate_openapi_versions():
         schema,
         title="Example API",
         version="1.0.0",
-        description="API using Sift validators",
+        description="API using Voltar  validators",
         openapi_version=OpenAPIVersion.V3_0
     )
     
@@ -411,7 +411,7 @@ def demonstrate_real_world_examples():
     """
     Demonstrate real-world use cases for schema validation in production applications.
     
-    These examples show how Sift can be used to validate:
+    These examples show how Voltar  can be used to validate:
     1. API endpoint schemas for REST APIs
     2. Data model schemas for application entities
     3. Configuration validation for application settings

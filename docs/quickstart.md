@@ -1,10 +1,10 @@
 # Quickstart
 
-This guide will help you quickly get started with Sift by introducing the core concepts and providing examples of common validation patterns.
+This guide will help you quickly get started with Voltar  by introducing the core concepts and providing examples of common validation patterns.
 
 ## Core Concepts
 
-Sift is built around a few simple yet powerful concepts:
+Voltar  is built around a few simple yet powerful concepts:
 
 - **Validators**: Classes that validate and transform data
 - **Composability**: Combine validators to create complex schemas
@@ -17,8 +17,8 @@ Sift is built around a few simple yet powerful concepts:
 First, let's import some basic validators:
 
 ```python
-from sift import String, Number, Boolean, Object, List
-from sift.validators.base import ValidationError
+from voltar  import String, Number, Boolean, Object, List
+from voltar .validators.base import ValidationError
 ```
 
 ### Primitive Validators
@@ -98,7 +98,7 @@ print(validated_user)
 
 ## Optional and Nullable Fields
 
-Sift handles missing data and explicit `None` values:
+Voltar  handles missing data and explicit `None` values:
 
 ```python
 schema = Object({
@@ -132,7 +132,7 @@ schema.validate({"username": "johndoe", "website": None})
 ```python
 # List of strings
 tags_schema = List(String()).max(5)
-tags_schema.validate(["python", "validation", "sift"])  # OK
+tags_schema.validate(["python", "validation", "voltar "])  # OK
 
 # List with unique items
 unique_ids = List(Number().int()).unique()
@@ -150,7 +150,7 @@ scores.validate({"math": 90, "science": 85})  # OK
 
 ## Error Handling
 
-Sift provides detailed validation errors that you can catch and handle:
+Voltar  provides detailed validation errors that you can catch and handle:
 
 ```python
 try:
@@ -200,13 +200,13 @@ except ValidationError as e:
 
 ## Best Practices
 
-Here are some recommended patterns when using Sift:
+Here are some recommended patterns when using Voltar :
 
 1. **Define reusable schemas**: Create common schemas that can be imported and reused across your application
 
     ```python
     # In schemas.py
-    from sift import String, Object
+    from voltar  import String, Object
     
     UserSchema = Object({
         "username": String().min(3).max(50),
@@ -225,11 +225,11 @@ Here are some recommended patterns when using Sift:
 
 4. **Include validation in your data access layer**: Validate data before processing or storing it
 
-5. **Leverage type hints**: Sift's type hints help your IDE provide better code completion and type checking
+5. **Leverage type hints**: Voltar 's type hints help your IDE provide better code completion and type checking
 
 ## Next Steps
 
-Now that you understand the basics of Sift, you can:
+Now that you understand the basics of Voltar , you can:
 
 - Learn about [Basic Validation](../guides/basic-validation.md) in depth
 - Explore [Advanced Validation](../guides/advanced-validation.md) techniques

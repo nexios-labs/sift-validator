@@ -12,7 +12,7 @@ import re
 from collections.abc import Sequence
 import inspect
 
-from sift.validators.base import Validator, ValidationError
+from voltar .validators.base import Validator, ValidationError
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -23,7 +23,7 @@ class List(Validator[ListType[Any], ListType[ItemType]]):
     Validator for list/array values.
     
     Examples:
-        >>> from sift.validators.primitives import String
+        >>> from voltar .validators.primitives import String
         >>> List(String()).validate(["hello", "world"])
         ['hello', 'world']
         >>> List(String()).min(3).validate(["a", "b"])  # Raises ValidationError
@@ -257,7 +257,7 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
     Validator for dictionary values.
     
     Examples:
-        >>> from sift.validators.primitives import String, Number
+        >>> from voltar .validators.primitives import String, Number
         >>> Dict({"name": String(), "age": Number().int()}).validate({"name": "John", "age": 30})
         {'name': 'John', 'age': 30}
     """
@@ -571,7 +571,7 @@ class Tuple(Validator[TupleType, TupleType]):
     Validator for tuple values with position-based validation.
     
     Examples:
-        >>> from sift.validators.primitives import String, Number
+        >>> from voltar .validators.primitives import String, Number
         >>> Tuple([String(), Number().int()]).validate(("hello", 42))
         ('hello', 42)
         >>> Tuple([String(), Number().int()]).validate(("hello", "world"))  # Raises ValidationError
@@ -741,7 +741,7 @@ class Union(Validator[Any, Any]):
     Validator that accepts values matching any of the provided validators.
     
     Examples:
-        >>> from sift.validators.primitives import String, Number
+        >>> from voltar .validators.primitives import String, Number
         >>> Union([String(), Number()]).validate("hello")
         'hello'
         >>> Union([String(), Number()]).validate(42)
