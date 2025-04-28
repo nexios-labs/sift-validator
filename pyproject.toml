@@ -3,14 +3,14 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "voltar "
+name = "voltar"
 version = "0.1.0"
 description = "Voltar  Validator is a lightweight and expressive Python library for defining, parsing, and validating data structures with ease. Designed for clarity, speed, and full control."
 authors = ["Chidebele Dunamis <techwithdunamix@example.com>"]
 license = " BSD-3-Clause"
-homepage = "https://github.com/nexios-labs/voltar -validator"
-repository = "https://github.com/nexios-labs/voltar -validator"
-documentation = "http://nexios-labs.gitbook.io/voltar -validator"
+homepage = "https://github.com/nexios-labs/voltar"
+repository = "https://github.com/nexios-labs/voltar"
+documentation = "http://nexios-labs.gitbook.io/voltar"
 readme = "readme.md"
 keywords = [
     "ASGI",

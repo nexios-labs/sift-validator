@@ -73,13 +73,13 @@ import inspect
 import re
 
 # Import Pydantic
-from pydantic import BaseModel, Field, EmailStr, validator, constr, conint, confloat, create_model
+from pydantic import BaseModel, Field, EmailStr,create_model
 
 # Import Voltar  validators
-from voltar .validators.base import Validator, ValidationError
-from voltar .validators.primitives import String, Number, Boolean, Any as Voltar Any, Null
-from voltar .validators.collections import List, Dict as Voltar Dict, Tuple as Voltar Tuple, Union
-from voltar .validators.objects import Object
+from voltar.validators.base import Validator, ValidationError
+from voltar.validators.primitives import Null, String, Number, Boolean, Any as  Any, Null
+from voltar.validators.collections import List, Dict as VoltarDict, Union, Tuple as VoltarTuple, Union
+from voltar.validators.objects import Object
 
 class SchemaConverter:
     """
@@ -198,17 +198,17 @@ class SchemaConverter:
             return self._convert_boolean_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, List):
             return self._convert_list_validator(validator, field_params, is_optional, is_nullable)
-        elif isinstance(validator, Voltar Dict):
+        elif isinstance(validator,  Dict):
             return self._convert_dict_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, Object):
             return self._convert_object_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, Union):
             return self._convert_union_validator(validator, field_params, is_optional, is_nullable)
-        elif isinstance(validator, Voltar Any):
+        elif isinstance(validator, Any):
             return self._convert_any_validator(validator, field_params, is_optional, is_nullable)
         elif isinstance(validator, Null):
             return self._convert_null_validator(validator, field_params)
-        elif isinstance(validator, Voltar Tuple):
+        elif isinstance(validator, Tuple):
             return self._convert_tuple_validator(validator, field_params, is_optional, is_nullable)
         else:
             # Default to Any for unknown validators
@@ -378,7 +378,7 @@ class SchemaConverter:
             
         return py_type, Field(**field_params) if field_params else None
     
-    def _convert_any_validator(self, validator: Voltar Any, field_params: Dict[str, Any],
+    def _convert_any_validator(self, validator:  Any, field_params: Dict[str, Any],
                            is_optional: bool, is_nullable: bool) -> Tuple[Type, Any]:
         """Convert Any validator to Pydantic field."""
         py_type = Any
@@ -394,7 +394,7 @@ class SchemaConverter:
         py_type = Optional[Any]
         return py_type, Field(default=None, **field_params)
     
-    def _convert_tuple_validator(self, validator: Voltar Tuple, field_params: Dict[str, Any],
+    def _convert_tuple_validator(self, validator:  Tuple, field_params: Dict[str, Any],
                              is_optional: bool, is_nullable: bool) -> Tuple[Type, Any]:
         """Convert Tuple validator to Pydantic field."""
         # Get the tuple item validators

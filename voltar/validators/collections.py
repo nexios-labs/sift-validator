@@ -276,6 +276,7 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
         self._pattern_properties: DictType[str, Validator] = {}
         self._min_properties: Optional[int] = None
         self._max_properties: Optional[int] = None
+        self._excluded_fields: set[str] = set()
         
         # Set required keys from schema by default
         # Only fields that are neither optional nor nullable are required
@@ -364,6 +365,27 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
         validator._max_properties = count
         return validator
         
+    def exclude(self, *fields: str) -> Self:
+        """
+        Exclude specific fields from validation.
+        
+        Args:
+            *fields: Field names to exclude from validation
+            
+        Returns:
+            Self: The validator instance for chaining
+            
+        Example:
+            >>> Dict({"name": String(), "age": Number()}).exclude("age")
+        """
+        validator = self._clone()
+        validator._excluded_fields = self._excluded_fields | set(fields)
+        
+        # Remove excluded fields from required keys
+        validator._required_keys = self._required_keys - validator._excluded_fields
+        
+        return validator
+        
     def _validate(self, data: Any, path: list[str | int]) -> DictType[Any, Any]:
         # Check for nullable fields
         if data is None and self._nullable:
@@ -404,7 +426,7 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
             
         # Validate schema properties
         for key, validator in self._schema.items():
-            if key in result:
+            if key in result and key not in self._excluded_fields:
                 item_path = path + [key]
                 result[key] = validator._validate(result[key], item_path)
                 validated_keys.add(key)
@@ -413,13 +435,13 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
         for pattern_str, validator in self._pattern_properties.items():
             pattern = re.compile(pattern_str)
             for key in result.keys():
-                if isinstance(key, str) and pattern.match(key):
+                if isinstance(key, str) and pattern.match(key) and key not in self._excluded_fields:
                     item_path = path + [key]
                     result[key] = validator._validate(result[key], item_path)
                     validated_keys.add(key)
                     
         # Handle additional properties
-        unvalidated_keys = set(result.keys()) - validated_keys
+        unvalidated_keys = set(result.keys()) - validated_keys - self._excluded_fields
         if unvalidated_keys:
             if self._additional_properties is False:
                 unexpected_keys_str = ", ".join(str(k) for k in unvalidated_keys)
@@ -479,7 +501,7 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
         
         # Schema property validations
         for key, validator in self._schema.items():
-            if key in result:
+            if key in result and key not in self._excluded_fields:
                 item_path = path + [key]
                 validation_tasks.append(
                     asyncio.create_task(
@@ -494,7 +516,7 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
         for pattern_str, validator in self._pattern_properties.items():
             pattern = re.compile(pattern_str)
             for key in result.keys():
-                if key not in validated_keys and isinstance(key, str) and pattern.match(key):
+                if key not in validated_keys and key not in self._excluded_fields and isinstance(key, str) and pattern.match(key):
                     item_path = path + [key]
                     task = asyncio.create_task(
                         validator._validate_async(result[key], item_path)
@@ -555,7 +577,7 @@ class Dict(Validator[DictType[Any, Any], DictType[Any, Any]]):
                 )
 
         # Check for unexpected properties
-        unvalidated_keys = set(result.keys()) - validated_keys
+        unvalidated_keys = set(result.keys()) - validated_keys - self._excluded_fields
         if unvalidated_keys and self._additional_properties is False:
             unexpected_keys_str = ", ".join(str(k) for k in unvalidated_keys)
             raise ValidationError(
