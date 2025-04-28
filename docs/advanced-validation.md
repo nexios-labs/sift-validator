@@ -450,6 +450,313 @@ product_data = {
 dynamic_schema.validate(product_data)  # OK
 ```
 
+## Object Schema Modification
+
+Voltar's Object validator provides several powerful methods to modify schemas dynamically. These methods enable you to create new schemas from existing ones, adapting them to specific validation requirements without duplicating code.
+
+### Extending Object Schemas
+
+The `extend` method allows you to create a new schema by adding additional fields to an existing schema.
+
+```python
+from voltar import Object, String, Number, Boolean
+
+# Define a base user schema
+user_schema = Object({
+    "username": String().min(3).max(20),
+    "email": String().email()
+})
+
+# Extend it to create an employee schema with additional fields
+employee_schema = user_schema.extend({
+    "department": String(),
+    "salary": Number().positive(),
+    "is_manager": Boolean().default(False)
+})
+
+# The original schema remains unchanged
+user_data = {
+    "username": "johndoe", 
+    "email": "john@example.com"
+}
+user_schema.validate(user_data)  # Success
+
+# The extended schema includes all original validations
+employee_data = {
+    "username": "johndoe",
+    "email": "john@example.com",
+    "department": "Engineering",
+    "salary": 75000
+    # is_manager defaults to False
+}
+employee_schema.validate(employee_data)  # Success
+
+# Attempting to extend with a field name that already exists raises an error
+try:
+    user_schema.extend({"email": String()})
+except ValueError as e:
+    print(e)  # "Cannot extend schema: conflicting field names {'email'}"
+```
+
+#### Key Features of Extend
+
+1. **New Schema Creation**: `extend` creates a new validator instance without modifying the original.
+2. **Configuration Preservation**: All validation rules and configurations from the base schema are preserved.
+3. **Conflict Prevention**: Voltar prevents field name conflicts by raising an error if you attempt to extend with a field name that already exists.
+4. **Type Safety**: The extended schema maintains full type checking for both original and new fields.
+
+### Excluding Fields During Validation
+
+The `exclude` method allows you to temporarily ignore specific fields during validation without removing them from the schema.
+
+```python
+from voltar import Object, String, Number
+
+# Define a user schema with sensitive information
+user_schema = Object({
+    "username": String().min(3),
+    "password": String().min(8),  # Sensitive field
+    "email": String().email(),    # Sensitive field
+    "age": Number().int()
+})
+
+# Create a public view that excludes sensitive fields during validation
+public_view = user_schema.exclude("password", "email")
+
+# Data with invalid excluded fields still passes validation
+user_data = {
+    "username": "johndoe",
+    "password": "weak",  # Would normally fail min(8) validation
+    "email": "invalid",  # Would normally fail email validation
+    "age": 30
+}
+
+public_view.validate(user_data)  # Success - excluded fields are ignored
+
+# The original schema still validates all fields
+try:
+    user_schema.validate(user_data)  # Fails validation
+except ValidationError as e:
+    print(e)  # ValidationErrors for password and email
+```
+
+#### Key Characteristics of Exclude
+
+1. **Temporary Exclusion**: Fields are only ignored during validation, not removed from the schema definition.
+2. **Schema Preservation**: The original schema structure remains intact.
+3. **Multiple Fields**: You can exclude any number of fields in a single operation.
+4. **Non-Validation**: Excluded fields can have any value (even invalid ones) and will still pass validation.
+5. **Field Presence**: Excluded fields can still be present in the input and output data.
+
+### Omitting Fields from Schemas
+
+The `omit` method creates a new schema by permanently removing specified fields. Unlike `exclude`, omitted fields become invalid inputs.
+
+```python
+from voltar import Object, String, Number
+
+# Define a user schema
+user_schema = Object({
+    "id": Number().int(),
+    "username": String(),
+    "email": String().email(),
+    "password": String().min(8),
+    "bio": String().optional()
+})
+
+# Create a new schema without specific fields
+public_profile = user_schema.omit(["password", "email"])
+
+# Valid data for the omitted schema
+public_data = {
+    "id": 123,
+    "username": "johndoe",
+    "bio": "Software developer"
+}
+public_profile.validate(public_data)  # Success
+
+# Invalid: contains omitted field
+try:
+    public_profile.validate({
+        "id": 123,
+        "username": "johndoe",
+        "password": "secret123"  # Error: field was omitted from schema
+    })
+except ValidationError as e:
+    print(e)  # Error: unexpected property 'password'
+```
+
+#### Key Differences Between Omit and Exclude
+
+1. **Schema Transformation**: 
+   - `omit` creates a completely new schema without the specified fields
+   - `exclude` keeps fields in the schema but ignores them during validation
+
+2. **Validation Behavior**:
+   - `omit`: Omitted fields are invalid inputs and will cause validation errors
+   - `exclude`: Excluded fields can be present with any value and are simply ignored
+
+3. **Use Cases**:
+   - `omit`: When creating fixed subsets of a schema for different contexts
+   - `exclude`: When temporarily ignoring fields for certain operations
+
+### Combining Schema Modifications
+
+Schema modification operations can be chained to create complex validation scenarios:
+
+```python
+from voltar import Object, String, Number, Boolean
+
+# Base schema
+user_schema = Object({
+    "id": Number().int(),
+    "username": String(),
+    "password": String().min(8),
+    "email": String().email(),
+    "bio": String().optional()
+})
+
+# Extend and then exclude
+employee = user_schema.extend({
+    "department": String(),
+    "salary": Number().positive(),
+    "is_active": Boolean().default(True)
+}).exclude("password", "email")
+
+# Extend and then omit
+manager = user_schema.extend({
+    "department": String(),
+    "team_size": Number().int().min(0)
+}).omit(["bio", "password"])
+
+# Different operations order
+public_employee = user_schema.omit(["password"]).extend({
+    "department": String()
+})
+```
+
+#### Operation Order Considerations
+
+1. **Extend → Exclude**: Excluded fields can include both original and newly added fields.
+2. **Extend → Omit**: Creates a schema without specified fields from either the original or extended schema.
+3. **Exclude → Extend**: New fields are added while maintaining exclusion rules for original fields.
+4. **Omit → Extend**: New fields are added to a schema that already has fields permanently removed.
+
+### Best Practices for Schema Modification
+
+1. **Modular Schema Design**
+
+   Break down complex schemas into reusable components:
+
+   ```python
+   # Define reusable schema components
+   address_schema = Object({
+       "street": String(),
+       "city": String(),
+       "country": String()
+   })
+
+   contact_schema = Object({
+       "email": String().email(),
+       "phone": String().optional()
+   })
+
+   # Compose larger schemas
+   user_schema = Object({
+       "name": String(),
+       "address": address_schema,
+       "contact": contact_schema
+   })
+
+   # Create specialized views as needed
+   public_user = user_schema.omit(["contact"])
+   ```
+
+2. **Consistent Transformation Chains**
+
+   Be mindful of operation order and its effects:
+
+   ```python
+   # Different operation orders can lead to different results
+   
+   # Fields are first excluded during validation, then new fields are added
+   view1 = user_schema.exclude("sensitive_field").extend({"new_field": String()})
+   
+   # A field is permanently removed from schema, then new fields are added
+   view2 = user_schema.omit(["sensitive_field"]).extend({"new_field": String()})
+   ```
+
+3. **Document Schema Transformations**
+
+   Add comments explaining why fields are being modified:
+
+   ```python
+   # Public API view (no sensitive data)
+   public_view = user_schema.omit([
+       "password",  # Security: never expose passwords
+       "email"      # Privacy: protect contact information
+   ])
+
+   # Admin view (all fields + management fields)
+   admin_view = user_schema.extend({
+       "role": String(),          # Administrative role
+       "last_login": String().datetime(),  # For activity monitoring
+       "is_active": Boolean().default(True)  # Account status
+   })
+   ```
+
+### Common Pitfalls and Solutions
+
+1. **Confusing Exclude and Omit**
+
+   Remember that exclude keeps fields in the schema but ignores them during validation, while omit removes them permanently:
+
+   ```python
+   # This still allows password in the input, it just won't be validated
+   unsafe_schema = user_schema.exclude("password")
+   
+   # This properly removes password from allowed inputs
+   safe_schema = user_schema.omit(["password"])
+   ```
+
+2. **Extending with Conflicting Field Names**
+
+   Always check for field name conflicts when extending schemas:
+
+   ```python
+   # Attempting to extend with existing field names
+   try:
+       user_schema.extend({"username": String()})  # Will fail
+   except ValueError as e:
+       print(e)  # "Cannot extend schema: conflicting field names {'username'}"
+       
+   # Safe way to add or override fields
+   new_schema = Object({
+       **user_schema.fields,  # Spread existing fields
+       "username": String().min(5)  # Override with new definition
+   })
+   ```
+
+3. **Not Updating Field Dependencies**
+
+   When omitting fields, be careful about dependencies between fields:
+
+   ```python
+   form_schema = Object({
+       "shipping_required": Boolean(),
+       "shipping_address": Object({...}).optional()
+   })
+   
+   # This removes shipping_address but keeps the field that controls it
+   # Leading to potential validation confusion
+   problematic = form_schema.omit(["shipping_address"])
+   
+   # Better to remove related fields together
+   better = form_schema.omit(["shipping_required", "shipping_address"])
+   ```
+
+By using these schema modification methods effectively, you can create flexible, reusable validation schemas that adapt to different contexts while maintaining strict type checking and validation rules.
+
 ## Union Types and Discriminators
 
 ### Basic Union Types
@@ -503,5 +810,12 @@ shape_schema = Union([
 circle = {"type": "circle", "radius": 5}
 shape_schema.validate(circle)  # OK
 
-rectangle = {"type": "
+rectangle = {"type": "rectangle", "width": 10, "height": 20}
+shape_schema.validate(rectangle)  # OK
 
+# Invalid shape type
+try:
+    shape_schema.validate({"type": "pentagon", "sides": 5})
+except ValidationError as e:
+    print(e)  # Value did not match any schema in union
+```
