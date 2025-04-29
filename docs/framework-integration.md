@@ -81,7 +81,7 @@ user_schema = Object({
 
 @app.post("/users")
 @catch_exceptions(ValidationError,validate_request)
-async def create_user(request: Request, validated_data: Dict[str, Any]):
+async def create_user(request: Request, response: Response)::
 
     user_data = await request.json
     validated_data = await user_schema.validate_async(user_data)    
@@ -102,7 +102,6 @@ from voltar import ValidationError
 
 app = get_application()
 
-@app.exception_handler(ValidationError)
 async def handle_validation_error(request: Request,resonse: Response, exc: ValidationError):
     """Global validation error handler."""
     return response.json({
@@ -117,6 +116,7 @@ async def handle_validation_error(request: Request,resonse: Response, exc: Valid
             for err in exc.errors
         ]
     }, status=422)
+@app.add_exception_handler(ValidationError, handle_validation_error)
 ```
 
 
