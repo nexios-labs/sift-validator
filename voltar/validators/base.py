@@ -16,98 +16,6 @@ from enum import Enum
 T = TypeVar("T")
 R = TypeVar("R")
 
-class Symbol:
-    """
-    A unique symbol for identifying validator attributes.
-    
-    Symbols can be used as unique identifiers for validation
-    operations, error codes, or other metadata.
-    """
-    
-    def __init__(self, name: str):
-        self.name = name
-    
-    def __repr__(self) -> str:
-        return f"Symbol({self.name})"
-    
-    def __str__(self) -> str:
-        return self.name
-
-# Define common error codes as symbols
-ERROR_CODES = {
-    "invalid_type": Symbol("invalid_type"),
-    "invalid_value": Symbol("invalid_value"),
-    "required": Symbol("required"),
-    "too_small": Symbol("too_small"),
-    "too_big": Symbol("too_big"),
-    "invalid_format": Symbol("invalid_format"),
-    "custom": Symbol("custom"),
-    "invalid_enum_value": Symbol("invalid_enum_value"),
-    "unrecognized_keys": Symbol("unrecognized_keys"),
-    "invalid_union": Symbol("invalid_union")
-}
-
-class ValidationIssue:
-    """
-    Structured representation of a single validation issue.
-    
-    This class provides detailed information about a validation
-    failure, including the path, error code, expected type,
-    and custom message.
-    """
-    
-    def __init__(
-        self,
-        code: str,
-        path: list[str | int],
-        message: str,
-        expected: Optional[str] = None,
-        received: Optional[str] = None,
-        keys: Optional[list[str]] = None,
-        **kwargs
-    ):
-        """
-        Initialize a validation issue with detailed information.
-        
-        Args:
-            code: Error code identifier
-            path: Path to the field that failed validation
-            message: Human-readable error message
-            expected: Expected type or value
-            received: Actual received type or value
-            keys: For unrecognized_keys errors, the names of the invalid keys
-            **kwargs: Additional context specific to the error
-        """
-        self.code = code
-        self.path = path.copy() if path else []
-        self.message = message
-        self.expected = expected
-        self.received = received
-        self.keys = keys
-        self.context = kwargs
-    
-    def to_dict(self) -> dict:
-        """Convert the issue to a dictionary representation."""
-        result = {
-            "code": self.code,
-            "path": self.path,
-            "message": self.message
-        }
-        
-        if self.expected is not None:
-            result["expected"] = self.expected
-        
-        if self.received is not None:
-            result["received"] = self.received
-            
-        if self.keys is not None:
-            result["keys"] = self.keys
-            
-        if self.context:
-            result.update(self.context)
-            
-        return result
-
 class ValidationError(ValueError):
     """Error raised when validation fails.
     
@@ -121,12 +29,8 @@ class ValidationError(ValueError):
     def __init__(self, 
                  message: Optional[str] = None, 
                  path: Optional[list[str | int]] = None, 
-                 errors: Optional[dict[str, str | dict]] = None,
-                 description: Optional[str] = None,
-                 code: Optional[str] = None,
-                 expected: Optional[str] = None,
-                 received: Optional[str] = None,
-                 issues: Optional[list[ValidationIssue]] = None):
+                 errors: Optional[dict[str, str]] = None,
+                 description: Optional[str] = None):
         """
         Initialize a ValidationError with detailed error information.
         
@@ -135,10 +39,6 @@ class ValidationError(ValueError):
             path: The path to the field with the error
             errors: A dictionary of field-error pairs
             description: A detailed description of the error
-            code: Error code identifier
-            expected: Expected type or value
-            received: Actual received type or value
-            issues: List of structured validation issues
         """
         self.errors: dict[str, dict] = {}
         self.path = path or []
@@ -146,111 +46,24 @@ class ValidationError(ValueError):
         # For backwards compatibility
         self.message = message or ""
         self.description = description
-        self.code = code or ERROR_CODES["custom"].name
-        self.expected = expected
-        self.received = received
-        
-        # Initialize issues list
-        self._issues: list[ValidationIssue] = issues or []
         
         # If errors dict is provided, use it
         if errors:
-            # Handle both simple string errors and dict errors
-            for field, content in errors.items():
-                if isinstance(content, str):
-                    self.errors[field] = {"message": content}
-                    if description:
-                        self.errors[field]["description"] = description
-                    
-                    # Create a ValidationIssue for this error
-                    field_path = self._parse_field_to_path(field)
-                    self._issues.append(ValidationIssue(
-                        code=code or ERROR_CODES["custom"].name,
-                        path=field_path,
-                        message=content,
-                        expected=expected,
-                        received=received
-                    ))
-                else:
-                    # Already a dictionary, use as is
-                    self.errors[field] = content
-                    
-                    # Create a ValidationIssue if one doesn't already exist
-                    if self._issues:
-                        continue
-                        
-                    field_path = self._parse_field_to_path(field)
-                    issue_code = content.get("code", code or ERROR_CODES["custom"].name)
-                    issue_msg = content.get("message", "Validation failed")
-                    
-                    self._issues.append(ValidationIssue(
-                        code=issue_code,
-                        path=field_path,
-                        message=issue_msg,
-                        expected=content.get("expected", expected),
-                        received=content.get("received", received)
-                    ))
+            # Convert the simple dict to the new format
+            for field, msg in errors.items():
+                self.errors[field] = {"message": msg}
+                if description:
+                    self.errors[field]["description"] = description
         
-        # If message and path are provided but no issues, add them to the errors dict and create an issue
-        if message and not self._issues:
+        # If message and path are provided, add them to the errors dict
+        if message:
             field = self._format_path(self.path) if self.path else "_base"
             self.errors[field] = {"message": message}
             if description:
                 self.errors[field]["description"] = description
-            if code:
-                self.errors[field]["code"] = code
-            if expected:
-                self.errors[field]["expected"] = expected
-            if received:
-                self.errors[field]["received"] = received
-                
-            # Add as a validation issue
-            self._issues.append(ValidationIssue(
-                code=code or ERROR_CODES["custom"].name,
-                path=self.path,
-                message=message,
-                expected=expected,
-                received=received
-            ))
         
         # Format the error message for the ValueError constructor
         super().__init__(self._format_error_message())
-    
-    def _parse_field_to_path(self, field: str) -> list[str | int]:
-        """Convert a field string like 'root.nested[0]' to a path list."""
-        if field == "_base":
-            return []
-            
-        # Handle the new arrow format
-        if " → " in field:
-            parts = []
-            for part in field.split(" → "):
-                if part.startswith("[") and part.endswith("]"):
-                    # Convert "[0]" to integer 0
-                    parts.append(int(part[1:-1]))
-                else:
-                    parts.append(part)
-            return parts
-            
-        # Legacy dot notation for backward compatibility
-        result = []
-        for part in field.split("."):
-            if "[" in part and "]" in part:
-                # Handle array indices like "items[0]"
-                base = part.split("[")[0]
-                if base:
-                    result.append(base)
-                indices = part.split("[")[1:]
-                for idx in indices:
-                    if "]" in idx:
-                        idx_value = idx.split("]")[0]
-                        try:
-                            result.append(int(idx_value))
-                        except ValueError:
-                            result.append(idx_value)
-            else:
-                result.append(part)
-        return result
     
     def _format_path(self, path: list[str | int]) -> str:
         """Format a path into a readable string representation.
@@ -292,64 +105,32 @@ class ValidationError(ValueError):
                 
         return "\n".join(formatted_errors)
     
-    def add_error(self, field: str, message: str, description: Optional[str] = None,
-                 code: Optional[str] = None, expected: Optional[str] = None,
-                 received: Optional[str] = None) -> None:
-        """Add a new field error with detailed information.
+    def add_error(self, field: str, message: str, description: Optional[str] = None) -> None:
+        """Add a new field error with optional description.
         
         Args:
             field: The field name
             message: The error message
             description: Optional detailed description
-            code: Error code identifier
-            expected: Expected type or value
-            received: Actual received type or value
         """
         error_data = {"message": message}
         if description:
             error_data["description"] = description
-        if code:
-            error_data["code"] = code
-        if expected:
-            error_data["expected"] = expected
-        if received:
-            error_data["received"] = received
-            
         self.errors[field] = error_data
         
-        # Add a ValidationIssue for this error
-        field_path = self._parse_field_to_path(field)
-        self._issues.append(ValidationIssue(
-            code=code or ERROR_CODES["custom"].name,
-            path=field_path,
-            message=message,
-            expected=expected,
-            received=received
-        ))
+    def merge(self, other: 'ValidationError') -> None:
+        """Merge another ValidationError's errors into this one."""
+        self.errors.update(other.errors)
         
-    def add_issue(self, issue: ValidationIssue) -> None:
-        """Add a ValidationIssue directly to the error.
+    @property
+    def error_dict(self) -> dict:
+        """Get the errors as a dictionary."""
+        return self.errors.copy()
         
-        Args:
-            issue: The validation issue to add
-        """
-        self._issues.append(issue)
-        
-        # Also add to the errors dictionary for backwards compatibility
-        field = self._format_path(issue.path) if issue.path else "_base"
-        error_data = {
-            "message": issue.message,
-            "code": issue.code
-        }
-        
-        if issue.expected:
-            error_data["expected"] = issue.expected
-            
-        if issue.received:
-            error_data["received"] = issue.received
-            
-        self.errors[field] = error_data
-        
+    @property
+    def simple_error_dict(self) -> dict[str, str]:
+        """Get a simplified version of errors (for backward compatibility)."""
+        return {field: error_data["message"] for field, error_data in self.errors.items()}
 
 class Validator(Generic[T, R]):
     """
