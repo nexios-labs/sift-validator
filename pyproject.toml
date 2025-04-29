@@ -11,7 +11,7 @@ license = " BSD-3-Clause"
 homepage = "https://github.com/nexios-labs/voltar"
 repository = "https://github.com/nexios-labs/voltar"
 documentation = "http://nexios-labs.gitbook.io/voltar"
-readme = "readme.md"
+readme = "README.md"
 keywords = [
     "ASGI",
     "backend",
