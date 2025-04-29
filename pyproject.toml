@@ -37,7 +37,6 @@ keywords = [
 [tool.poetry.group.dev.dependencies]
 python = ">=3.7"
 pytest = "~=8.3.4"
-pytest-cov = "^4.1.0"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_fixture_scope = "function"
