@@ -239,7 +239,7 @@ class SchemaConverter:
             field_params["max_length"] = max_length
             
         if pattern is not None:
-            field_params["regex"] = pattern
+            field_params["pattern"] = pattern
         
         # Handle special types
         if is_email:
