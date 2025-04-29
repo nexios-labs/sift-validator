@@ -96,6 +96,7 @@ class Validator(Generic[T, R]):
         """Set a default value to use when the input is undefined."""
         validator = self._clone()
         validator._default = value
+        self.optional()
         
         return validator
     
