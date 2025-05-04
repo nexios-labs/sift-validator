@@ -1,3 +1,88 @@
+<p align="center">
+<img src="./logo.svg" alt="Voltar Logo" width="200" height="200" />
+</p>
+
+<p align="center"  >
+
+# Voltar 
+
+</p>
+
+A modern Python validation library with Zod-like syntax, async support, and OpenAPI integration.
+
+## Features
+
+- 🔄 **Chainable API**: Intuitive, fluent interface for building validation schemas
+- ⚡ **Async Support**: Fast, non-blocking validation for high-performance applications
+- 📝 **Type Hints**: Comprehensive typing for excellent editor integration
+- 📊 **OpenAPI**: Seamless generation of OpenAPI schemas from your validators
+- 🔍 **Powerful Validation**: Built-in validators for common use cases with custom validation support
+- 🔧 **Data Transformation**: Transform and normalize data during validation
+
+## Installation
+
+```bash
+pip install voltar 
+```
+
+## Quick Start
+
+```python
+import voltar as v
+
+# Define a schema
+user_schema = v.Object({
+    "username": v.String().min(3).max(20).trim(),
+    "email": v.String().email(),
+    "age": v.Number().int().min(18).optional(),
+    "tags": v.List(v.String()).min(1).max(5),
+})
+
+# Validate data
+try:
+    valid_user = user_schema.validate({
+        "username": "  johndoe  ",  # Will be trimmed
+        "email": "john@example.com",
+        "tags": ["python", "validation"]
+    })
+    print(valid_user)
+except ValueError as e:
+    print(f"Validation error: {e}")
+
+# Async validation
+import asyncio
+
+async def validate_user_async():
+    try:
+        valid_user = await user_schema.validate_async({
+            "username": "johndoe",
+            "email": "john@example.com",
+            "tags": ["python", "validation"]
+        })
+        print(valid_user)
+    except ValueError as e:
+        print(f"Validation error: {e}")
+
+asyncio.run(validate_user_async())
+```
+
+## OpenAPI Integration
+
+```python
+import voltar as v
+from voltar.openapi import generate_openapi_schema
+
+user_schema = v.Object({
+    "username": v.String().min(3).max(20),
+    "email": v.String().email(),
+    "age": v.Number().int().min(18),
+})
+
+# Generate OpenAPI schema
+openapi_schema = generate_openapi_schema(user_schema)
+print(openapi_schema)
+```
+
 # Schema Modification
 
 Voltar provides powerful schema modification capabilities through three main methods: `extend`, `exclude`, and `omit`. These methods allow you to adapt and reuse schemas flexibly while maintaining type safety and validation rules.
@@ -7,18 +92,18 @@ Voltar provides powerful schema modification capabilities through three main met
 Use `extend` to add new fields to an existing schema without modifying the original:
 
 ```python
-from voltar.validators import Object, String, Number, Email
+import voltar as v
 
 # Base user schema
-user_schema = Object({
-    "name": String(),
-    "age": Number()
+user_schema = v.Object({
+    "name": v.String(),
+    "age": v.Number()
 })
 
 # Create employee schema by extending user schema
 employee_schema = user_schema.extend({
-    "department": String(),
-    "salary": Number()
+    "department": v.String(),
+    "salary": v.Number()
 })
 
 # Base schema remains unchanged
@@ -41,12 +126,14 @@ employee_data = employee_schema.validate({
 Use `exclude` to temporarily ignore specific fields during validation. The fields remain in the schema but aren't validated:
 
 ```python
+import voltar as v
+
 # Schema with sensitive data
-user_schema = Object({
-    "name": String(),
-    "age": Number(),
-    "email": Email(),
-    "ssn": String()
+user_schema = v.Object({
+    "name": v.String(),
+    "age": v.Number(),
+    "email": v.Email(),
+    "ssn": v.String()
 })
 
 # Create public view that doesn't validate sensitive fields
@@ -66,12 +153,14 @@ public_schema.validate({
 Use `omit` to create a new schema without specific fields. Unlike `exclude`, omitted fields are not allowed in the data:
 
 ```python
+import voltar as v
+
 # Full user schema
-user_schema = Object({
-    "name": String(),
-    "age": Number(),
-    "email": Email(),
-    "password": String()
+user_schema = v.Object({
+    "name": v.String(),
+    "age": v.Number(),
+    "email": v.Email(),
+    "password": v.String()
 })
 
 # Create public profile schema without sensitive data
@@ -110,15 +199,17 @@ profile_schema.validate({
 You can chain or combine these operations for more complex schema modifications:
 
 ```python
+import voltar as v
+
 # Start with comprehensive schema
-full_schema = Object({
-    "name": String(),
-    "age": Number(),
-    "email": Email(),
-    "password": String(),
-    "preferences": Object({
-        "theme": String(),
-        "notifications": Boolean()
+full_schema = v.Object({
+    "name": v.String(),
+    "age": v.Number(),
+    "email": v.Email(),
+    "password": v.String(),
+    "preferences": v.Object({
+        "theme": v.String(),
+        "notifications": v.Boolean()
     })
 })
 
@@ -130,8 +221,8 @@ public_profile = (
     full_schema
     .omit(["password", "email"])  # Remove sensitive fields
     .extend({
-        "avatar": String(),
-        "bio": String()
+        "avatar": v.String(),
+        "bio": v.String()
     })  # Add public profile fields
     .exclude("preferences")  # Don't validate preferences
 )
@@ -150,13 +241,15 @@ profile = public_profile.validate({
 
 1. **API Response Schemas**
    ```python
+   import voltar as v
+   
    # Internal schema with all fields
-   internal = Object({
-       "id": Number(),
-       "name": String(),
-       "email": Email(),
-       "created_at": DateTime(),
-       "internal_notes": String()
+   internal = v.Object({
+       "id": v.Number(),
+       "name": v.String(),
+       "email": v.Email(),
+       "created_at": v.DateTime(),
+       "internal_notes": v.String()
    })
 
    # Public API response schema
@@ -165,12 +258,14 @@ profile = public_profile.validate({
 
 2. **Form Validation**
    ```python
+   import voltar as v
+   
    # Complete user schema
-   user = Object({
-       "username": String(),
-       "email": Email(),
-       "password": String(),
-       "confirm_password": String()
+   user = v.Object({
+       "username": v.String(),
+       "email": v.Email(),
+       "password": v.String(),
+       "confirm_password": v.String()
    })
 
    # Schema for profile update form (no password fields)
@@ -179,13 +274,15 @@ profile = public_profile.validate({
 
 3. **Role-Based Schemas**
    ```python
+   import voltar as v
+   
    # Base product schema
-   product = Object({
-       "id": Number(),
-       "name": String(),
-       "price": Number(),
-       "cost": Number(),
-       "supplier_id": String()
+   product = v.Object({
+       "id": v.Number(),
+       "name": v.String(),
+       "price": v.Number(),
+       "cost": v.Number(),
+       "supplier_id": v.String()
    })
 
    # Customer view (omit internal fields)
@@ -213,85 +310,3 @@ profile = public_profile.validate({
    - `extend` then `omit` to remove fields from the complete schema
    - `omit` then `extend` to add new fields to a reduced schema
    - `exclude` can be used at any point to skip validation
-
-# Voltar 
-
-A modern Python validation library with Zod-like syntax, async support, and OpenAPI integration.
-
-## Features
-
-- 🔄 **Chainable API**: Intuitive, fluent interface for building validation schemas
-- ⚡ **Async Support**: Fast, non-blocking validation for high-performance applications
-- 📝 **Type Hints**: Comprehensive typing for excellent editor integration
-- 📊 **OpenAPI**: Seamless generation of OpenAPI schemas from your validators
-- 🔍 **Powerful Validation**: Built-in validators for common use cases with custom validation support
-- 🔧 **Data Transformation**: Transform and normalize data during validation
-
-## Installation
-
-```bash
-pip install voltar 
-```
-
-## Quick Start
-
-```python
-from voltar  import String, Number, Object, List
-
-# Define a schema
-user_schema = Object({
-    "username": String().min(3).max(20).trim(),
-    "email": String().email(),
-    "age": Number().int().min(18).optional(),
-    "tags": List(String()).min(1).max(5),
-})
-
-# Validate data
-try:
-    valid_user = user_schema.validate({
-        "username": "  johndoe  ",  # Will be trimmed
-        "email": "john@example.com",
-        "tags": ["python", "validation"]
-    })
-    print(valid_user)
-except ValueError as e:
-    print(f"Validation error: {e}")
-
-# Async validation
-import asyncio
-
-async def validate_user_async():
-    try:
-        valid_user = await user_schema.validate_async({
-            "username": "johndoe",
-            "email": "john@example.com",
-            "tags": ["python", "validation"]
-        })
-        print(valid_user)
-    except ValueError as e:
-        print(f"Validation error: {e}")
-
-asyncio.run(validate_user_async())
-```
-
-## OpenAPI Integration
-
-```python
-from voltar  import String, Number, Object
-from voltar .openapi import generate_openapi_schema
-
-user_schema = Object({
-    "username": String().min(3).max(20),
-    "email": String().email(),
-    "age": Number().int().min(18),
-})
-
-# Generate OpenAPI schema
-openapi_schema = generate_openapi_schema(user_schema)
-print(openapi_schema)
-```
-
-## License
-
-BSD-3-CLAUSE
-
